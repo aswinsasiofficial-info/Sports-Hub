@@ -17,7 +17,7 @@
                     <div class="mb-4">
                         <label class="form-label fw-bold">Username</label>
                         <div class="input-group">
-                            <span class="input-group-text bg-success text-white">
+                            <span class="input-group-text bg-dark text-white">
                                 <i class="bi bi-person-badge"></i>
                             </span>
                             <input type="text" class="form-control" name="username" 
@@ -28,7 +28,7 @@
                     <div class="mb-4">
                         <label class="form-label fw-bold">Password</label>
                         <div class="input-group">
-                            <span class="input-group-text bg-success text-white">
+                            <span class="input-group-text bg-dark text-white">
                                 <i class="bi bi-key"></i>
                             </span>
                             <input type="password" class="form-control" name="password" 
@@ -36,11 +36,11 @@
                         </div>
                     </div>
                     
-                    <button type="submit" class="btn btn-success w-100 py-2 mb-3">
+                    <button type="submit" class="btn btn-dark w-100 py-2 mb-3">
                         <i class="bi bi-shield-check me-2"></i>Login as Owner
                     </button>
                     
-                    <div class="alert alert-info">
+                    <div class="alert alert-info alert-dark">
                         <i class="bi bi-info-circle"></i>
                         <small>Don't have an owner account? Contact admin to create one.</small>
                     </div>
@@ -49,44 +49,11 @@
                     
                     <div class="text-center">
                         <p class="text-muted mb-2">Not an owner?</p>
-                        <a href="{% url 'login' %}" class="btn btn-outline-primary w-100">
+                        <a href="{% url 'login' %}" class="btn btn-outline-dark w-100">
                             <i class="bi bi-person me-2"></i>User Login
                         </a>
                     </div>
                 </form>
-            </div>
-        </div>
-        
-        <!-- Owner Benefits -->
-        <div class="mt-4">
-            <div class="card border-success">
-                <div class="card-header bg-success text-white py-2">
-                    <h6 class="mb-0"><i class="bi bi-graph-up"></i> Owner Benefits</h6>
-                </div>
-                <div class="card-body">
-                    <ul class="list-unstyled mb-0">
-                        <li class="mb-2">
-                            <i class="bi bi-check-circle-fill text-success"></i>
-                            <small>Manage multiple venues</small>
-                        </li>
-                        <li class="mb-2">
-                            <i class="bi bi-check-circle-fill text-success"></i>
-                            <small>View booking analytics</small>
-                        </li>
-                        <li class="mb-2">
-                            <i class="bi bi-check-circle-fill text-success"></i>
-                            <small>Set time slots & prices</small>
-                        </li>
-                        <li class="mb-2">
-                            <i class="bi bi-check-circle-fill text-success"></i>
-                            <small>Track revenue</small>
-                        </li>
-                        <li class="mb-2">
-                            <i class="bi bi-check-circle-fill text-success"></i>
-                            <small>Customer management</small>
-                        </li>
-                    </ul>
-                </div>
             </div>
         </div>
     </div>

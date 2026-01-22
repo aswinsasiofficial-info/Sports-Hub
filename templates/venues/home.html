@@ -5,8 +5,7 @@
 {% block content %}
 <!-- Hero Section -->
 <section class="hero-section text-center py-5 rounded mb-5">
-    <h1 class="display-4 fw-bold mb-3">Sports Hub</h1>
-    <p class="lead fs-4 mb-3">Book Your Game, Anytime, Anywhere</p>
+    <h1 class="lead mb-3">BOOK YOUR GAME, ANYTIME, ANYWHERE</h1>
     <p class="mb-4 fs-5">Find and book premium sports venues near you. From badminton courts to swimming pools.</p>
     <a href="{% url 'venue_list' %}" class="btn btn-light btn-lg px-4">
         <i class="bi bi-search me-2"></i>Explore Venues →
@@ -17,7 +16,7 @@
 <section class="mb-5">
     <h2 class="text-center mb-3">Choose Your Sport</h2>
     <p class="text-center text-muted mb-4">Select from our wide range of sports facilities</p>
-    
+
     <div class="row g-4">
         {% for sport in sports %}
         <div class="col-md-2 col-sm-4 col-6">
@@ -25,10 +24,10 @@
                 <div class="card sport-card text-center p-3 h-100">
                     <div class="display-6 mb-2">
                         {% if sport.icon and sport.icon.url %}
-                            <img src="{{ sport.icon.url }}" alt="{{ sport.name }}" 
-                                 style="width: 50px; height: 50px; object-fit: contain;">
+                        <img src="{{ sport.icon.url }}" alt="{{ sport.name }}"
+                            style="width: 50px; height: 50px; object-fit: contain;">
                         {% else %}
-                            {{ sport.icon_url }}
+                        {{ sport.icon_url }}
                         {% endif %}
                     </div>
                     <h6 class="card-title">{{ sport.get_name_display }}</h6>
@@ -46,21 +45,23 @@
     <div class="row g-4">
         <div class="col-md-4">
             <div class="card h-100 text-center p-4 border-primary">
-                <div class="display-6 mb-3 text-primary">1️⃣</div>
+                <div class="display-6 mb-3 text-primary"><ion-icon name="location-sharp"></ion-icon>
+                </div>
                 <h4 class="text-primary">Find a Venue</h4>
                 <p class="text-muted">Browse sports venues by location and sport type</p>
             </div>
         </div>
         <div class="col-md-4">
             <div class="card h-100 text-center p-4 border-success">
-                <div class="display-6 mb-3 text-success">2️⃣</div>
+                <div class="display-6 mb-3 text-success"><ion-icon name="time-sharp"></ion-icon>
+                </div>
                 <h4 class="text-success">Select Time Slot</h4>
                 <p class="text-muted">Choose your preferred date and time slot</p>
             </div>
         </div>
         <div class="col-md-4">
             <div class="card h-100 text-center p-4 border-warning">
-                <div class="display-6 mb-3 text-warning">3️⃣</div>
+                <div class="display-6 mb-3 text-warning"><ion-icon name="checkmark-done-circle-sharp"></ion-icon></div>
                 <h4 class="text-warning">Book & Play</h4>
                 <p class="text-muted">Secure your booking with instant confirmation</p>
             </div>
