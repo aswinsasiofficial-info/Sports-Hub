@@ -7,7 +7,7 @@
 <section class="hero-section text-center py-5 rounded mb-5">
     <h1 class="lead mb-3">BOOK YOUR GAME, ANYTIME, ANYWHERE</h1>
     <p class="mb-4 fs-5">Find and book premium sports venues near you. From badminton courts to swimming pools.</p>
-    <a href="{% url 'venue_list' %}" class="btn btn-light btn-lg px-4">
+    <a href="{% url 'venue_list' %}" class="btn btn-light btn-lg px-4 rounded-pill">
         <i class="bi bi-search me-2"></i>Explore Venues →
     </a>
 </section>
@@ -37,38 +37,6 @@
         {% endfor %}
     </div>
 </section>
-<!-- How It Works -->
-<section class="mb-5">
-    <h2 class="text-center mb-3">How It Works</h2>
-    <p class="text-center text-muted mb-4">Simple steps to book your favorite sports venue</p>
-
-    <div class="row g-4">
-        <div class="col-md-4">
-            <div class="card h-100 text-center p-4 border-primary">
-                <div class="display-6 mb-3 text-primary"><ion-icon name="location-sharp"></ion-icon>
-                </div>
-                <h4 class="text-primary">Find a Venue</h4>
-                <p class="text-muted">Browse sports venues by location and sport type</p>
-            </div>
-        </div>
-        <div class="col-md-4">
-            <div class="card h-100 text-center p-4 border-success">
-                <div class="display-6 mb-3 text-success"><ion-icon name="time-sharp"></ion-icon>
-                </div>
-                <h4 class="text-success">Select Time Slot</h4>
-                <p class="text-muted">Choose your preferred date and time slot</p>
-            </div>
-        </div>
-        <div class="col-md-4">
-            <div class="card h-100 text-center p-4 border-warning">
-                <div class="display-6 mb-3 text-warning"><ion-icon name="checkmark-done-circle-sharp"></ion-icon></div>
-                <h4 class="text-warning">Book & Play</h4>
-                <p class="text-muted">Secure your booking with instant confirmation</p>
-            </div>
-        </div>
-    </div>
-</section>
-
 <!-- Featured Venues -->
 {% if featured_venues %}
 <section class="mt-5">
@@ -112,6 +80,39 @@
         {% endfor %}
     </div>
 </section>
+
+<!-- How It Works -->
+<section class="mb-5 mt-5">
+    <h2 class="text-center mb-3">How It Works</h2>
+    <p class="text-center text-muted mb-4">Simple steps to book your favorite sports venue</p>
+
+    <div class="row g-4">
+        <div class="col-md-4">
+            <div class="card h-100 text-center p-4 border-primary">
+                <div class="display-6 mb-3 text-primary"><ion-icon name="location-sharp"></ion-icon>
+                </div>
+                <h4 class="text-primary">Find a Venue</h4>
+                <p class="text-muted">Browse sports venues by location and sport type</p>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card h-100 text-center p-4 border-success">
+                <div class="display-6 mb-3 text-success"><ion-icon name="time-sharp"></ion-icon>
+                </div>
+                <h4 class="text-success">Select Time Slot</h4>
+                <p class="text-muted">Choose your preferred date and time slot</p>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card h-100 text-center p-4 border-warning">
+                <div class="display-6 mb-3 text-warning"><ion-icon name="checkmark-done-circle-sharp"></ion-icon></div>
+                <h4 class="text-warning">Book & Play</h4>
+                <p class="text-muted">Secure your booking with instant confirmation</p>
+            </div>
+        </div>
+    </div>
+</section>
+
 {% endif %}
 
 <!-- Testimonial -->
