@@ -1,0 +1,305 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ venue.name }} - Sports Hub{% endblock %}
+
+{% block content %}
+<div class="row">
+    <!-- Venue Details -->
+    <div class="col-md-8">
+        <div class="card mb-4">
+            <div class="position-relative">
+                <img src="{{ venue.image_url }}" class="card-img-top" alt="{{ venue.name }}"
+                    style="height: 400px; object-fit: cover;">
+                <div class="position-absolute bottom-0 start-0 m-3">
+                    <span class="badge bg-primary fs-6 p-2">
+                        {{ venue.sport.get_name_display }}
+                    </span>
+                </div>
+            </div>
+            <div class="card-body">
+                <h1 class="card-title mb-3">{{ venue.name }}</h1>
+
+                <div class="row mb-4">
+                    <div class="col-md-6">
+                        <h5><i class="bi bi-geo-alt text-primary"></i> Address</h5>
+                        <p class="text-muted">{{ venue.address }}</p>
+                    </div>
+                    <div class="col-md-6">
+                        <h5><i class="bi bi-cash-coin text-success"></i> Price</h5>
+                        <p class="fs-3 fw-bold text-success">₹{{ venue.price_per_hour }} <small
+                                class="fs-6 text-muted">per hour</small></p>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-md-6">
+                        <h5><i class="bi bi-person-circle text-info"></i> Owner Contact</h5>
+                        <div class="card bg-light">
+                            <div class="card-body">
+                                <p class="mb-1"><strong>Name:</strong> {{ venue.owner.username }}</p>
+                                <p class="mb-1"><strong>Email:</strong> {{ venue.owner.email }}</p>
+                                {% if venue.owner.phone_number %}
+                                <p class="mb-0"><strong>Phone:</strong> {{ venue.owner.phone_number }}</p>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <h5><i class="bi bi-info-circle text-warning"></i> Venue Info</h5>
+                        <div class="card bg-light">
+                            <div class="card-body">
+                                <p class="mb-1"><strong>Status:</strong>
+                                    {% if venue.is_active %}
+                                    <span class="badge bg-success">Open for Booking</span>
+                                    {% else %}
+                                    <span class="badge bg-danger">Currently Closed</span>
+                                    {% endif %}
+                                </p>
+                                <p class="mb-1"><strong>Added:</strong> {{ venue.created_at|date:"M d, Y" }}</p>
+                                <p class="mb-0"><strong>Last Updated:</strong> {{ venue.updated_at|date:"M d, Y" }}</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Available Time Slots -->
+        <div class="card">
+            <div class="card-header bg-primary text-white">
+                <h4 class="mb-0"><i class="bi bi-calendar-check"></i> Available Time Slots</h4>
+            </div>
+            <div class="card-body">
+                {% if time_slots %}
+                <div class="row g-3">
+                    {% for slot in time_slots %}
+                    <div class="col-md-6">
+                        <div class="card border-success">
+                            <div class="card-body">
+                                <h6 class="card-title">
+                                    <i class="bi bi-calendar-date text-success"></i>
+                                    {{ slot.date|date:"D, d M Y" }}
+                                </h6>
+                                <p class="mb-2">
+                                    <i class="bi bi-clock text-success"></i>
+                                    {{ slot.start_time|time:"H:i" }} - {{ slot.end_time|time:"H:i" }}
+                                </p>
+                                {% if user.is_authenticated and user.user_type == 'user' %}
+                                <button class="btn btn-success btn-sm w-100 book-slot-btn" data-slot-id="{{ slot.id }}"
+                                    data-date="{{ slot.date|date:'Y-m-d' }}"
+                                    data-start="{{ slot.start_time|time:'H:i' }}"
+                                    data-end="{{ slot.end_time|time:'H:i' }}">
+                                    <i class="bi bi-bookmark-check"></i> Book This Slot
+                                </button>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+                {% else %}
+                <div class="text-center py-4">
+                    <div class="display-4 mb-3">⏰</div>
+                    <h5>No available time slots</h5>
+                    <p class="text-muted">All slots are currently booked. Please check back later.</p>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    <!-- Booking Panel -->
+    <div class="col-md-4">
+        <div class="sticky-top" style="top: 20px;">
+            <div class="card">
+                <div class="card-header bg-success text-white">
+                    <h4 class="mb-0"><i class="bi bi-cart-check"></i> Book This Venue</h4>
+                </div>
+                <div class="card-body">
+                    {% if user.is_authenticated %}
+                    {% if user.user_type == 'user' %}
+                    {% if time_slots %}
+                    <div id="booking-form">
+                        <form method="post" action="{% url 'create_booking' %}" id="book-venue-form">
+                            {% csrf_token %}
+                            <input type="hidden" name="venue_id" value="{{ venue.id }}">
+                            <input type="hidden" name="time_slot_id" id="time_slot_id">
+
+                            <div class="mb-3">
+                                <label class="form-label">Selected Date & Time</label>
+                                <div class="form-control bg-light" id="selected-slot-display">
+                                    No slot selected
+                                </div>
+                            </div>
+
+                            <div class="alert alert-info">
+                                <div class="d-flex justify-content-between">
+                                    <strong>Venue Price:</strong>
+                                    <span>₹{{ venue.price_per_hour }}/hour</span>
+                                </div>
+                                <div class="d-flex justify-content-between mt-2">
+                                    <strong>Duration:</strong>
+                                    <span>1 hour</span>
+                                </div>
+                                <hr>
+                                <div class="d-flex justify-content-between fw-bold">
+                                    <strong>Total Amount:</strong>
+                                    <span class="text-success">₹{{ venue.price_per_hour }}</span>
+                                </div>
+                            </div>
+
+                            <div class="mb-3">
+                                <label class="form-label">Special Instructions (Optional)</label>
+                                <textarea class="form-control" name="instructions" rows="3"
+                                    placeholder="Any special requirements..."></textarea>
+                            </div>
+
+                            <button type="submit" class="btn btn-success w-100" id="proceed-btn" disabled>
+                                <i class="bi bi-lock-fill"></i> Proceed to Payment
+                            </button>
+                        </form>
+                    </div>
+                    {% else %}
+                    <div class="alert alert-warning">
+                        <i class="bi bi-exclamation-triangle"></i>
+                        <strong>No slots available</strong>
+                        <p class="mb-0 mt-2">All time slots are currently booked. Please check back later.</p>
+                    </div>
+                    {% endif %}
+                    {% else %}
+                    <div class="alert alert-warning">
+                        <i class="bi bi-person-check"></i>
+                        <strong>Owner Account Detected</strong>
+                        <p class="mb-0 mt-2">You are logged in as an owner. Please use a user account to book venues.
+                        </p>
+                    </div>
+                    {% endif %}
+                    {% else %}
+                    <div class="text-center">
+                        <div class="display-4 mb-3">🔐</div>
+                        <h5>Login Required</h5>
+                        <p class="text-muted mb-4">Please login to book this venue</p>
+                        <a href="{% url 'login' %}" class="btn btn-primary w-100 mb-2">
+                            <i class="bi bi-box-arrow-in-right"></i> Login
+                        </a>
+                        <a href="{% url 'signup' %}" class="btn btn-outline-primary w-100">
+                            <i class="bi bi-person-plus"></i> Create Account
+                        </a>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+
+            <!-- Quick Info -->
+            <div class="card mt-3">
+                <div class="card-header bg-info text-white">
+                    <h6 class="mb-0"><i class="bi bi-info-circle"></i> Booking Information</h6>
+                </div>
+                <div class="card-body">
+                    <ul class="list-unstyled mb-0">
+                        <li class="mb-2">
+                            <i class="bi bi-check-circle text-success"></i>
+                            <small>Instant confirmation</small>
+                        </li>
+                        <li class="mb-2">
+                            <i class="bi bi-shield-check text-success"></i>
+                            <small>Secure payment</small>
+                        </li>
+                        <li class="mb-2">
+                            <i class="bi bi-arrow-clockwise text-success"></i>
+                            <small>Easy cancellation</small>
+                        </li>
+                        <li class="mb-2">
+                            <i class="bi bi-headset text-success"></i>
+                            <small>24/7 support</small>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Booking Modal -->
+<div class="modal fade" id="bookingModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header bg-success text-white">
+                <h5 class="modal-title">Confirm Booking</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <p>You are about to book:</p>
+                <div class="alert alert-success">
+                    <strong>{{ venue.name }}</strong><br>
+                    <span id="modal-date-time"></span><br>
+                    <strong>Amount:</strong> ₹{{ venue.price_per_hour }}
+                </div>
+                <p>Click "Confirm" to proceed to payment.</p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                <button type="button" class="btn btn-success" id="confirm-booking">Confirm Booking</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% block extra_js %}
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        // Handle slot selection
+        const bookSlotButtons = document.querySelectorAll('.book-slot-btn');
+        const selectedSlotDisplay = document.getElementById('selected-slot-display');
+        const timeSlotIdInput = document.getElementById('time_slot_id');
+        const proceedBtn = document.getElementById('proceed-btn');
+        const modalDateTime = document.getElementById('modal-date-time');
+        const confirmBookingBtn = document.getElementById('confirm-booking');
+        const bookingForm = document.getElementById('book-venue-form');
+
+        let selectedSlot = null;
+
+        bookSlotButtons.forEach(button => {
+            button.addEventListener('click', function () {
+                selectedSlot = {
+                    id: this.dataset.slotId,
+                    date: this.dataset.date,
+                    start: this.dataset.start,
+                    end: this.dataset.end
+                };
+
+                // Update display
+                selectedSlotDisplay.textContent = `${selectedSlot.date} | ${selectedSlot.start} - ${selectedSlot.end}`;
+                selectedSlotDisplay.classList.add('bg-success', 'text-white');
+
+                // Update hidden input
+                timeSlotIdInput.value = selectedSlot.id;
+
+                // Enable proceed button
+                proceedBtn.disabled = false;
+
+                // Update modal content
+                modalDateTime.textContent = `${selectedSlot.date} | ${selectedSlot.start} - ${selectedSlot.end}`;
+
+                // Show modal
+                const modal = new bootstrap.Modal(document.getElementById('bookingModal'));
+                modal.show();
+            });
+        });
+
+        // Handle final confirmation
+        confirmBookingBtn.addEventListener('click', function () {
+            bookingForm.submit();
+        });
+
+        // Direct form submission
+        bookingForm.addEventListener('submit', function (e) {
+            if (!timeSlotIdInput.value) {
+                e.preventDefault();
+                alert('Please select a time slot first');
+            }
+        });
+    });
+</script>
+{% endblock %}
+{% endblock %}

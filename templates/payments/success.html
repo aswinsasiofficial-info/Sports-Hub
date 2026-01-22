@@ -1,0 +1,185 @@
+{% extends 'base.html' %}
+
+{% block title %}Payment Successful - Sports Hub{% endblock %}
+
+{% block extra_css %}
+<style>
+    .success-container {
+        max-width: 600px;
+        margin: 0 auto;
+    }
+    .success-icon {
+        font-size: 80px;
+        color: #28a745;
+    }
+    .confetti {
+        position: fixed;
+        width: 10px;
+        height: 10px;
+        background: #ff6b6b;
+        opacity: 0.7;
+        border-radius: 50%;
+        animation: fall 5s linear infinite;
+    }
+    @keyframes fall {
+        0% {
+            transform: translateY(-100px) rotate(0deg);
+            opacity: 1;
+        }
+        100% {
+            transform: translateY(100vh) rotate(360deg);
+            opacity: 0;
+        }
+    }
+    .booking-card {
+        border-left: 5px solid #28a745;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="success-container text-center">
+    <!-- Success Icon -->
+    <div class="success-icon mb-3">
+        <i class="bi bi-check-circle-fill"></i>
+    </div>
+    
+    <h1 class="mb-3">Payment Successful! 🎉</h1>
+    <p class="lead text-muted mb-4">Your booking has been confirmed. Check your email for details.</p>
+    
+    <!-- Booking Summary -->
+    <div class="card booking-card mb-4 shadow-sm">
+        <div class="card-body">
+            <h5 class="card-title mb-3">Booking Confirmed</h5>
+            <div class="row text-start">
+                <div class="col-md-6 mb-3">
+                    <small class="text-muted">Booking ID</small>
+                    <p class="fw-bold">#{{ booking.id }}</p>
+                </div>
+                <div class="col-md-6 mb-3">
+                    <small class="text-muted">Payment ID</small>
+                    <p class="fw-bold">{{ booking.razorpay_payment_id|slice:"0:15" }}...</p>
+                </div>
+                <div class="col-md-6 mb-3">
+                    <small class="text-muted">Venue</small>
+                    <p class="fw-bold">{{ booking.venue.name }}</p>
+                </div>
+                <div class="col-md-6 mb-3">
+                    <small class="text-muted">Sport</small>
+                    <p><span class="badge bg-primary">{{ booking.venue.sport.get_name_display }}</span></p>
+                </div>
+                <div class="col-md-6 mb-3">
+                    <small class="text-muted">Date & Time</small>
+                    <p class="fw-bold">
+                        {{ booking.time_slot.date|date:"M d, Y" }}<br>
+                        {{ booking.time_slot.start_time|time:"H:i" }} - {{ booking.time_slot.end_time|time:"H:i" }}
+                    </p>
+                </div>
+                <div class="col-md-6 mb-3">
+                    <small class="text-muted">Amount Paid</small>
+                    <p class="fw-bold text-success">₹{{ booking.total_price }}</p>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Next Steps -->
+    <div class="card mb-4">
+        <div class="card-header bg-light">
+            <h6 class="mb-0"><i class="bi bi-check2-square"></i> What's Next?</h6>
+        </div>
+        <div class="card-body">
+            <div class="row text-center">
+                <div class="col-md-4 mb-3">
+                    <div class="p-3 border rounded">
+                        <div class="display-6 text-primary mb-2">
+                            <i class="bi bi-calendar-check"></i>
+                        </div>
+                        <h6>Save the Date</h6>
+                        <small class="text-muted">Add to your calendar</small>
+                    </div>
+                </div>
+                <div class="col-md-4 mb-3">
+                    <div class="p-3 border rounded">
+                        <div class="display-6 text-success mb-2">
+                            <i class="bi bi-envelope"></i>
+                        </div>
+                        <h6>Check Email</h6>
+                        <small class="text-muted">Confirmation sent</small>
+                    </div>
+                </div>
+                <div class="col-md-4 mb-3">
+                    <div class="p-3 border rounded">
+                        <div class="display-6 text-warning mb-2">
+                            <i class="bi bi-clock"></i>
+                        </div>
+                        <h6>Arrive Early</h6>
+                        <small class="text-muted">15 minutes before</small>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Action Buttons -->
+    <div class="d-grid gap-2 d-md-block mb-4">
+        <a href="{% url 'booking_detail' booking.id %}" class="btn btn-primary px-4 me-2">
+            <i class="bi bi-receipt"></i> View Booking Details
+        </a>
+        <a href="{% url 'my_bookings' %}" class="btn btn-outline-primary px-4 me-2">
+            <i class="bi bi-list-check"></i> All Bookings
+        </a>
+        <a href="{% url 'venue_list' %}" class="btn btn-success px-4">
+            <i class="bi bi-plus-circle"></i> Book Another
+        </a>
+    </div>
+    
+    <!-- Important Notes -->
+    <div class="alert alert-info">
+        <h6><i class="bi bi-info-circle"></i> Important Information</h6>
+        <ul class="mb-0">
+            <li>Carry your booking confirmation when visiting the venue</li>
+            <li>Arrive 15 minutes before your scheduled time</li>
+            <li>Contact venue owner for any changes or queries</li>
+            <li>Cancellation policy applies as per terms</li>
+        </ul>
+    </div>
+    
+    <!-- Share -->
+    <div class="mt-4">
+        <p class="text-muted">Share your booking:</p>
+        <div class="d-flex justify-content-center gap-2">
+            <button class="btn btn-outline-primary">
+                <i class="bi bi-whatsapp"></i> WhatsApp
+            </button>
+            <button class="btn btn-outline-info">
+                <i class="bi bi-messenger"></i> Messenger
+            </button>
+            <button class="btn btn-outline-secondary">
+                <i class="bi bi-envelope"></i> Email
+            </button>
+        </div>
+    </div>
+</div>
+
+<!-- Confetti Effect -->
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Create confetti
+    for (let i = 0; i < 50; i++) {
+        const confetti = document.createElement('div');
+        confetti.className = 'confetti';
+        confetti.style.left = Math.random() * 100 + 'vw';
+        confetti.style.background = `hsl(${Math.random() * 360}, 100%, 50%)`;
+        confetti.style.animationDuration = (Math.random() * 3 + 2) + 's';
+        confetti.style.animationDelay = Math.random() * 5 + 's';
+        document.body.appendChild(confetti);
+        
+        // Remove confetti after animation
+        setTimeout(() => {
+            confetti.remove();
+        }, 8000);
+    }
+});
+</script>
+{% endblock %}

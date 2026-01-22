@@ -1,0 +1,151 @@
+{% extends 'base.html' %}
+
+{% block title %}Find Venues - Sports Hub{% endblock %}
+
+{% block content %}
+<div class="row mb-4">
+    <div class="col-md-12">
+        <h1 class="mb-3">Find Sports Venues</h1>
+        <p class="text-muted">Browse and book from our premium sports venues</p>
+    </div>
+</div>
+
+<!-- Search Filters -->
+<div class="card mb-4">
+    <div class="card-body">
+        <form method="get" class="row g-3">
+            <div class="col-md-4">
+                <label class="form-label">Sport Type</label>
+                <select class="form-select" name="sport">
+                    <option value="">All Sports</option>
+                    {% for sport in sports %}
+                    <option value="{{ sport.name }}" {% if selected_sport == sport.name %}selected{% endif %}>
+                        {{ sport.get_name_display }}
+                    </option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="col-md-6">
+                <label class="form-label">Location</label>
+                <input type="text" class="form-control" name="location" placeholder="Enter city or area..." 
+                       value="{{ request.GET.location }}">
+            </div>
+            <div class="col-md-2 d-flex align-items-end">
+                <button type="submit" class="btn btn-dark w-100">
+                    <i class="bi bi-search"></i> Search
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- Sports Quick Filters -->
+<div class="mb-4">
+    <h5>Quick Filters:</h5>
+    <div class="d-flex flex-wrap gap-2">
+        <a href="{% url 'venue_list' %}" class="btn btn-outline-secondary btn-sm">
+            <i class="bi bi-grid"></i> All
+        </a>
+        {% for sport in sports %}
+        <a href="{% url 'sport_venues' sport.name %}" class="btn btn-outline-primary btn-sm">
+            {% if sport.name == 'badminton' %}🏸
+            {% elif sport.name == 'cricket' %}🏏
+            {% elif sport.name == 'football' %}⚽
+            {% elif sport.name == 'tennis' %}🎾
+            {% elif sport.name == 'swimming' %}🏊{% endif %}
+            {{ sport.get_name_display }}
+        </a>
+        {% endfor %}
+    </div>
+</div>
+
+<!-- Venues Grid -->
+{% if venues %}
+<div class="row g-4">
+    {% for venue in venues %}
+    <div class="col-md-4">
+        <div class="card venue-card h-100">
+            <div class="position-relative">
+                <img src="{{ venue.image_url }}" class="card-img-top" alt="{{ venue.name }}"
+                     style="height: 200px; object-fit: cover;">
+                <span class="position-absolute top-0 start-0 m-2 badge bg-dark">
+                    {{ venue.sport.get_name_display }}
+                </span>
+                <span class="position-absolute top-0 end-0 m-2 badge bg-success">
+                    ₹{{ venue.price_per_hour }}/hr
+                </span>
+            </div>
+            <div class="card-body d-flex flex-column">
+                <h5 class="card-title">{{ venue.name }}</h5>
+                <p class="card-text text-muted small mb-2">
+                    <i class="bi bi-geo-alt"></i> {{ venue.address|truncatechars:60 }}
+                </p>
+                <div class="mt-auto">
+                    <div class="d-flex justify-content-between align-items-center mb-3">
+                        <span class="badge bg-light text-dark">
+                            <i class="bi bi-person"></i> {{ venue.owner.username }}
+                        </span>
+                        {% if venue.is_active %}
+                        <span class="badge bg-success">Available</span>
+                        {% else %}
+                        <span class="badge bg-danger">Closed</span>
+                        {% endif %}
+                    </div>
+                    <a href="{% url 'venue_detail' venue.id %}" class="btn btn-primary w-100">
+                        <i class="bi bi-calendar-plus"></i> Book Now
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% endfor %}
+</div>
+
+{% if not venues and request.GET %}
+<div class="text-center py-5">
+    <div class="display-4 mb-3">😕</div>
+    <h4>No venues found</h4>
+    <p class="text-muted">Try different search criteria or check back later.</p>
+    <a href="{% url 'venue_list' %}" class="btn btn-primary">View All Venues</a>
+</div>
+{% endif %}
+
+{% else %}
+<div class="text-center py-5">
+    <div class="display-4 mb-3">🏟️</div>
+    <h4>No venues available</h4>
+    <p class="text-muted">Check back soon for new venues in your area.</p>
+</div>
+{% endif %}
+
+<!-- Pagination (Optional) -->
+{% if venues.has_other_pages %}
+<nav class="mt-4">
+    <ul class="pagination justify-content-center">
+        {% if venues.has_previous %}
+        <li class="page-item">
+            <a class="page-link" href="?page={{ venues.previous_page_number }}{% for key,value in request.GET.items %}{% if key != 'page' %}&{{ key }}={{ value }}{% endif %}{% endfor %}">
+                <i class="bi bi-chevron-left"></i> Previous
+            </a>
+        </li>
+        {% endif %}
+        
+        {% for i in venues.paginator.page_range %}
+        <li class="page-item {% if venues.number == i %}active{% endif %}">
+            <a class="page-link" href="?page={{ i }}{% for key,value in request.GET.items %}{% if key != 'page' %}&{{ key }}={{ value }}{% endif %}{% endfor %}">
+                {{ i }}
+            </a>
+        </li>
+        {% endfor %}
+        
+        {% if venues.has_next %}
+        <li class="page-item">
+            <a class="page-link" href="?page={{ venues.next_page_number }}{% for key,value in request.GET.items %}{% if key != 'page' %}&{{ key }}={{ value }}{% endif %}{% endfor %}">
+                Next <i class="bi bi-chevron-right"></i>
+            </a>
+        </li>
+        {% endif %}
+    </ul>
+</nav>
+{% endif %}
+{% endblock %}

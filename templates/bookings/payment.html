@@ -1,0 +1,289 @@
+{% extends 'base.html' %}
+
+{% block title %}Payment - Sports Hub{% endblock %}
+
+{% block extra_css %}
+<style>
+    .payment-container {
+        max-width: 500px;
+        margin: 0 auto;
+    }
+    .payment-card {
+        border: 2px solid #e0e0e0;
+        border-radius: 15px;
+        overflow: hidden;
+    }
+    .payment-header {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        padding: 20px;
+    }
+    .payment-details {
+        background: #f8f9fa;
+        padding: 20px;
+    }
+    .razorpay-logo {
+        height: 30px;
+        margin-bottom: 10px;
+    }
+    .payment-option {
+        border: 1px solid #dee2e6;
+        border-radius: 8px;
+        padding: 15px;
+        margin-bottom: 10px;
+        cursor: pointer;
+        transition: all 0.3s;
+    }
+    .payment-option:hover {
+        border-color: #667eea;
+        background: #f8f9fa;
+    }
+    .payment-option.active {
+        border-color: #667eea;
+        background: rgba(102, 126, 234, 0.1);
+    }
+    .payment-method-icon {
+        font-size: 24px;
+        margin-right: 10px;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="payment-container">
+    <!-- Payment Header -->
+    <div class="payment-header text-center">
+        <h3><i class="bi bi-lock-fill"></i> Secure Payment</h3>
+        <p class="mb-0">Complete your booking with secure payment</p>
+    </div>
+    
+    <!-- Booking Summary -->
+    <div class="card mb-4 shadow-sm">
+        <div class="card-body">
+            <h5 class="card-title mb-3">Booking Summary</h5>
+            <div class="row mb-3">
+                <div class="col-6">
+                    <small class="text-muted">Venue</small>
+                    <p class="mb-0 fw-bold">{{ booking.venue.name }}</p>
+                </div>
+                <div class="col-6 text-end">
+                    <small class="text-muted">Sport</small>
+                    <p class="mb-0">
+                        <span class="badge bg-primary">{{ booking.venue.sport.get_name_display }}</span>
+                    </p>
+                </div>
+            </div>
+            <div class="row mb-3">
+                <div class="col-6">
+                    <small class="text-muted">Date & Time</small>
+                    <p class="mb-0">
+                        {{ booking.time_slot.date|date:"M d, Y" }}<br>
+                        {{ booking.time_slot.start_time|time:"H:i" }} - {{ booking.time_slot.end_time|time:"H:i" }}
+                    </p>
+                </div>
+                <div class="col-6 text-end">
+                    <small class="text-muted">Duration</small>
+                    <p class="mb-0 fw-bold">1 hour</p>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Payment Details -->
+    <div class="card mb-4 shadow-sm">
+        <div class="card-body">
+            <h5 class="card-title mb-3">Payment Details</h5>
+            
+            <div class="payment-details rounded mb-4">
+                <div class="d-flex justify-content-between mb-2">
+                    <span>Venue Price:</span>
+                    <span>₹{{ booking.venue.price_per_hour }}</span>
+                </div>
+                <div class="d-flex justify-content-between mb-2">
+                    <span>Duration:</span>
+                    <span>1 hour</span>
+                </div>
+                <div class="d-flex justify-content-between mb-2">
+                    <span>Platform Fee:</span>
+                    <span>₹0</span>
+                </div>
+                <div class="d-flex justify-content-between mb-2">
+                    <span>Tax:</span>
+                    <span>₹0</span>
+                </div>
+                <hr>
+                <div class="d-flex justify-content-between fw-bold fs-5">
+                    <span>Total Amount:</span>
+                    <span class="text-success">₹{{ booking.total_price }}</span>
+                </div>
+            </div>
+            
+            <!-- Payment Methods -->
+            <h6 class="mb-3">Select Payment Method</h6>
+            
+            <div class="payment-option active" id="razorpayOption">
+                <div class="form-check">
+                    <input class="form-check-input" type="radio" name="paymentMethod" id="razorpayMethod" checked>
+                    <label class="form-check-label d-flex align-items-center w-100" for="razorpayMethod">
+                        <i class="bi bi-credit-card payment-method-icon text-primary"></i>
+                        <div class="flex-grow-1">
+                            <strong>Credit/Debit Card</strong>
+                            <p class="mb-0 small text-muted">Visa, MasterCard, RuPay, American Express</p>
+                        </div>
+                        <img src="https://razorpay.com/assets/razorpay-logo.svg" alt="Razorpay" class="razorpay-logo">
+                    </label>
+                </div>
+            </div>
+            
+            <div class="payment-option" id="upiOption">
+                <div class="form-check">
+                    <input class="form-check-input" type="radio" name="paymentMethod" id="upiMethod">
+                    <label class="form-check-label d-flex align-items-center w-100" for="upiMethod">
+                        <i class="bi bi-phone payment-method-icon text-success"></i>
+                        <div class="flex-grow-1">
+                            <strong>UPI</strong>
+                            <p class="mb-0 small text-muted">Google Pay, PhonePe, Paytm, BHIM</p>
+                        </div>
+                    </label>
+                </div>
+            </div>
+            
+            <div class="payment-option" id="netbankingOption">
+                <div class="form-check">
+                    <input class="form-check-input" type="radio" name="paymentMethod" id="netbankingMethod">
+                    <label class="form-check-label d-flex align-items-center w-100" for="netbankingMethod">
+                        <i class="bi bi-bank payment-method-icon text-info"></i>
+                        <div class="flex-grow-1">
+                            <strong>Net Banking</strong>
+                            <p class="mb-0 small text-muted">All major banks</p>
+                        </div>
+                    </label>
+                </div>
+            </div>
+            
+            <!-- Terms -->
+            <div class="form-check mt-4">
+                <input class="form-check-input" type="checkbox" id="termsCheck" required checked>
+                <label class="form-check-label small text-muted" for="termsCheck">
+                    I agree to the <a href="#" class="text-decoration-none">Terms & Conditions</a> and authorize Sports Hub to charge my payment method for the total amount shown.
+                </label>
+            </div>
+            
+            <!-- Pay Button -->
+            <button class="btn btn-success w-100 mt-4 py-3" id="payButton">
+                <i class="bi bi-lock-fill me-2"></i>Pay ₹{{ booking.total_price }}
+            </button>
+            
+            <!-- Test Mode Notice -->
+            <div class="alert alert-warning mt-3">
+                <i class="bi bi-info-circle"></i>
+                <strong>Test Mode:</strong> Use test card details for payment.
+                <div class="mt-2 small">
+                    <strong>Test Card:</strong> 4111 1111 1111 1111<br>
+                    <strong>Expiry:</strong> Any future date | <strong>CVV:</strong> 123
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Security Badges -->
+    <div class="text-center">
+        <div class="d-flex justify-content-center gap-4 mb-3">
+            <div class="text-center">
+                <div class="display-6 text-success">
+                    <i class="bi bi-shield-check"></i>
+                </div>
+                <small>SSL Secure</small>
+            </div>
+            <div class="text-center">
+                <div class="display-6 text-primary">
+                    <i class="bi bi-lock"></i>
+                </div>
+                <small>PCI Compliant</small>
+            </div>
+            <div class="text-center">
+                <div class="display-6 text-info">
+                    <i class="bi bi-credit-card"></i>
+                </div>
+                <small>Secure Payment</small>
+            </div>
+        </div>
+        <p class="text-muted small">
+            Your payment is secured with 256-bit encryption. We do not store your card details.
+        </p>
+    </div>
+</div>
+
+{% block extra_js %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Handle payment method selection
+    const paymentOptions = document.querySelectorAll('.payment-option');
+    paymentOptions.forEach(option => {
+        option.addEventListener('click', function() {
+            // Remove active class from all options
+            paymentOptions.forEach(opt => {
+                opt.classList.remove('active');
+                opt.querySelector('input').checked = false;
+            });
+            
+            // Add active class to clicked option
+            this.classList.add('active');
+            this.querySelector('input').checked = true;
+        });
+    });
+    
+    // Razorpay integration
+    const payButton = document.getElementById('payButton');
+    const amount = {{ amount }};
+    const razorpayOrderId = '{{ razorpay_order_id }}';
+    const razorpayKeyId = '{{ razorpay_key_id }}';
+    
+    payButton.addEventListener('click', function() {
+        if (!document.getElementById('termsCheck').checked) {
+            alert('Please accept the terms and conditions');
+            return;
+        }
+        
+        const options = {
+            "key": razorpayKeyId,
+            "amount": amount * 100, // Convert to paise
+            "currency": "INR",
+            "name": "Sports Hub",
+            "description": "Booking Payment",
+            "order_id": razorpayOrderId,
+            "handler": function(response) {
+                // Redirect to success page with payment details
+                window.location.href = `/payments/success/?order_id=${response.razorpay_order_id}&payment_id=${response.razorpay_payment_id}&signature=${response.razorpay_signature}`;
+            },
+            "prefill": {
+                "name": "{{ user.username }}",
+                "email": "{{ user.email }}",
+                "contact": "{{ user.phone_number|default:'9999999999' }}"
+            },
+            "notes": {
+                "booking_id": "{{ booking.id }}",
+                "venue": "{{ booking.venue.name }}"
+            },
+            "theme": {
+                "color": "#667eea"
+            },
+            "modal": {
+                "ondismiss": function() {
+                    console.log('Payment modal closed');
+                }
+            }
+        };
+        
+        const rzp = new Razorpay(options);
+        rzp.open();
+    });
+    
+    // Auto-trigger Razorpay for demo
+    // setTimeout(() => {
+    //     payButton.click();
+    // }, 2000);
+});
+</script>
+{% endblock %}
+{% endblock %}

@@ -1,0 +1,188 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ sport.get_name_display }} Venues - Sports Hub{% endblock %}
+
+{% block content %}
+<div class="row mb-4">
+    <div class="col-md-12">
+        <div class="d-flex align-items-center mb-3">
+            <div class="me-3 display-4">
+                {% if sport.name == 'badminton' %}🏸
+                {% elif sport.name == 'cricket' %}🏏
+                {% elif sport.name == 'football' %}⚽
+                {% elif sport.name == 'tennis' %}🎾
+                {% elif sport.name == 'swimming' %}🏊{% endif %}
+            </div>
+            <div>
+                <h1 class="mb-1">{{ sport.get_name_display }} Venues</h1>
+                <p class="text-muted mb-0">Find and book premium {{ sport.get_name_display|lower }} venues near you</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Sport Info -->
+<div class="card mb-4">
+    <div class="card-body">
+        <div class="row">
+            <div class="col-md-8">
+                <h4>About {{ sport.get_name_display }}</h4>
+                <p class="text-muted">
+                    {% if sport.name == 'badminton' %}
+                    Book professional badminton courts with proper lighting and flooring. Perfect for casual games or
+                    professional practice.
+                    {% elif sport.name == 'cricket' %}
+                    Find cricket nets and grounds for practice sessions and matches. Various pitch types available.
+                    {% elif sport.name == 'football' %}
+                    Book football turfs and grounds for 5-a-side or 11-a-side matches. Professional quality fields.
+                    {% elif sport.name == 'tennis' %}
+                    Tennis courts with different surfaces available. Book for singles or doubles matches.
+                    {% elif sport.name == 'swimming' %}
+                    Olympic-size and recreational swimming pools. Perfect for fitness training or leisurely swims.
+                    {% endif %}
+                </p>
+            </div>
+            <div class="col-md-4">
+                <div class="card bg-light">
+                    <div class="card-body text-center">
+                        <h6>Quick Stats</h6>
+                        <div class="display-4 fw-bold text-primary">{{ venues.count }}</div>
+                        <small class="text-muted">Available Venues</small>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Other Sports Quick Links -->
+<div class="mb-4">
+    <h6>Other Sports:</h6>
+    <div class="d-flex flex-wrap gap-2">
+        <a href="{% url 'venue_list' %}" class="btn btn-outline-secondary btn-sm">
+            <i class="bi bi-grid"></i> All Sports
+        </a>
+        {% for other_sport in all_sports %}
+        {% if other_sport.name != sport.name %}
+        <a href="{% url 'sport_venues' other_sport.name %}" class="btn btn-outline-primary btn-sm">
+            {% if other_sport.name == 'badminton' %}🏸
+            {% elif other_sport.name == 'cricket' %}🏏
+            {% elif other_sport.name == 'football' %}⚽
+            {% elif other_sport.name == 'tennis' %}🎾
+            {% elif other_sport.name == 'swimming' %}🏊{% endif %}
+            {{ other_sport.get_name_display }}
+        </a>
+        {% endif %}
+        {% endfor %}
+    </div>
+</div>
+
+<!-- Venues Grid -->
+{% if venues %}
+<div class="row g-4">
+    {% for venue in venues %}
+    <div class="col-md-4">
+        <div class="card h-100">
+            <div class="position-relative">
+                <img src="{{ venue.image_url }}" class="card-img-top" alt="{{ venue.name }}"
+                    style="height: 200px; object-fit: cover;">
+                <span class="position-absolute top-0 start-0 m-2 badge bg-dark">
+                    {{ venue.sport.get_name_display }}
+                </span>
+                <span class="position-absolute top-0 end-0 m-2 badge bg-success">
+                    ₹{{ venue.price_per_hour }}/hr
+                </span>
+            </div>
+            <div class="card-body d-flex flex-column">
+                <h5 class="card-title">{{ venue.name }}</h5>
+                <p class="card-text text-muted small mb-2">
+                    <i class="bi bi-geo-alt"></i> {{ venue.address|truncatechars:60 }}
+                </p>
+                <div class="mt-auto">
+                    <div class="d-flex justify-content-between align-items-center mb-3">
+                        <span class="badge bg-light text-dark">
+                            <i class="bi bi-person"></i> {{ venue.owner.username }}
+                        </span>
+                        {% if venue.is_active %}
+                        <span class="badge bg-success">Available</span>
+                        {% else %}
+                        <span class="badge bg-danger">Closed</span>
+                        {% endif %}
+                    </div>
+                    <a href="{% url 'venue_detail' venue.id %}" class="btn btn-primary w-100">
+                        <i class="bi bi-calendar-plus"></i> Book Now
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% endfor %}
+</div>
+{% else %}
+<div class="text-center py-5">
+    <div class="display-4 mb-3">
+        {% if sport.name == 'badminton' %}🏸
+        {% elif sport.name == 'cricket' %}🏏
+        {% elif sport.name == 'football' %}⚽
+        {% elif sport.name == 'tennis' %}🎾
+        {% elif sport.name == 'swimming' %}🏊{% endif %}
+    </div>
+    <h3>No {{ sport.get_name_display|lower }} venues available</h3>
+    <p class="text-muted mb-4">Check back soon for new {{ sport.get_name_display|lower }} venues in your area.</p>
+    <a href="{% url 'venue_list' %}" class="btn btn-primary">Browse All Sports</a>
+</div>
+{% endif %}
+
+<!-- Sport Tips -->
+<div class="card mt-4">
+    <div class="card-header bg-info text-white">
+        <h6 class="mb-0">
+            <i class="bi bi-lightbulb"></i>
+            {{ sport.get_name_display }} Booking Tips
+        </h6>
+    </div>
+    <div class="card-body">
+        <div class="row">
+            <div class="col-md-6">
+                <ul>
+                    {% if sport.name == 'badminton' %}
+                    <li>Book courts with proper lighting</li>
+                    <li>Check shuttlecock quality</li>
+                    <li>Verify court surface type</li>
+                    <li>Bring your own racket or rent</li>
+                    {% elif sport.name == 'cricket' %}
+                    <li>Check pitch type (mat/turf)</li>
+                    <li>Verify net facilities</li>
+                    <li>Bring appropriate gear</li>
+                    <li>Check boundary size</li>
+                    {% elif sport.name == 'football' %}
+                    <li>Verify turf quality</li>
+                    <li>Check goalpost condition</li>
+                    <li>Bring proper football shoes</li>
+                    <li>Hydration facilities available</li>
+                    {% elif sport.name == 'tennis' %}
+                    <li>Check court surface</li>
+                    <li>Verify net height</li>
+                    <li>Ball quality matters</li>
+                    <li>Lighting for evening games</li>
+                    {% elif sport.name == 'swimming' %}
+                    <li>Check pool depth</li>
+                    <li>Locker room facilities</li>
+                    <li>Bring swimming cap if required</li>
+                    <li>Shower facilities available</li>
+                    {% endif %}
+                </ul>
+            </div>
+            <div class="col-md-6">
+                <ul>
+                    <li>Book in advance for weekends</li>
+                    <li>Arrive 15 minutes early</li>
+                    <li>Carry valid ID proof</li>
+                    <li>Follow venue rules</li>
+                    <li>Respect time slots</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,314 @@
+{% extends 'base.html' %}
+
+{% block title %}My Bookings - Sports Hub{% endblock %}
+
+{% block content %}
+<div class="row mb-4">
+    <div class="col-md-12">
+        <div class="d-flex justify-content-between align-items-center">
+            <div>
+                <h1 class="mb-2">My Bookings</h1>
+                <p class="text-muted">Manage and track all your sports venue bookings</p>
+            </div>
+            <div>
+                <a href="{% url 'venue_list' %}" class="btn btn-primary">
+                    <i class="bi bi-plus-circle"></i> Book New Venue
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Stats -->
+<div class="row g-3 mb-4">
+    <div class="col-md-3">
+        <div class="card bg-primary text-white">
+            <div class="card-body">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                        <h6 class="mb-0">Total Bookings</h6>
+                        <h3 class="mt-2 mb-0">{{ bookings.count }}</h3>
+                    </div>
+                    <div class="display-6">
+                        <i class="bi bi-calendar-check"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-3">
+        <div class="card bg-success text-white">
+            <div class="card-body">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                        <h6 class="mb-0">Confirmed</h6>
+                        <h3 class="mt-2 mb-0">{{ bookings|length }}</h3>
+                    </div>
+                    <div class="display-6">
+                        <i class="bi bi-check-circle"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-3">
+        <div class="card bg-warning text-white">
+            <div class="card-body">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                        <h6 class="mb-0">Pending</h6>
+                        <h3 class="mt-2 mb-0">0</h3>
+                    </div>
+                    <div class="display-6">
+                        <i class="bi bi-clock-history"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-3">
+        <div class="card bg-info text-white">
+            <div class="card-body">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                        <h6 class="mb-0">Total Spent</h6>
+                        <h3 class="mt-2 mb-0">
+                            ₹{% if bookings %}{% for booking in bookings %}{{ booking.total_price|add:"0" }}{% endfor %}{% else %}0{% endif %}
+                        </h3>
+                    </div>
+                    <div class="display-6">
+                        <i class="bi bi-cash-stack"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Filter Tabs -->
+<div class="card mb-4">
+    <div class="card-header bg-light">
+        <ul class="nav nav-tabs card-header-tabs">
+            <li class="nav-item">
+                <a class="nav-link active" href="#">All Bookings</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="#">Upcoming</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="#">Past</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="#">Cancelled</a>
+            </li>
+        </ul>
+    </div>
+</div>
+
+<!-- Bookings List -->
+{% if bookings %}
+<div class="card">
+    <div class="card-body">
+        <div class="table-responsive">
+            <table class="table table-hover">
+                <thead class="table-light">
+                    <tr>
+                        <th>Booking ID</th>
+                        <th>Venue Details</th>
+                        <th>Date & Time</th>
+                        <th>Amount</th>
+                        <th>Status</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for booking in bookings %}
+                    <tr>
+                        <td>
+                            <strong>#{{ booking.id }}</strong>
+                            <br>
+                            <small class="text-muted">{{ booking.booking_date|date:"M d, Y" }}</small>
+                        </td>
+                        <td>
+                            <div class="d-flex">
+                                <div class="flex-shrink-0">
+                                    <img src="{{ booking.venue.image_url }}" alt="{{ booking.venue.name }}"
+                                         class="rounded" width="60" height="60" style="object-fit: cover;">
+                                </div>
+                                <div class="flex-grow-1 ms-3">
+                                    <h6 class="mb-1">{{ booking.venue.name }}</h6>
+                                    <small class="text-muted">
+                                        {{ booking.venue.sport.get_name_display }}
+                                        <br>
+                                        <i class="bi bi-geo-alt"></i> {{ booking.venue.address|truncatechars:30 }}
+                                    </small>
+                                </div>
+                            </div>
+                        </td>
+                        <td>
+                            <strong>{{ booking.time_slot.date|date:"D, M d" }}</strong>
+                            <br>
+                            <small class="text-muted">
+                                {{ booking.time_slot.start_time|time:"H:i" }} - {{ booking.time_slot.end_time|time:"H:i" }}
+                            </small>
+                        </td>
+                        <td>
+                            <strong class="text-success">₹{{ booking.total_price }}</strong>
+                            <br>
+                            <small class="text-muted">Paid via Razorpay</small>
+                        </td>
+                        <td>
+                            {% if booking.status == 'confirmed' %}
+                            <span class="badge bg-success">
+                                <i class="bi bi-check-circle"></i> Confirmed
+                            </span>
+                            {% elif booking.status == 'pending' %}
+                            <span class="badge bg-warning">
+                                <i class="bi bi-clock"></i> Pending
+                            </span>
+                            {% elif booking.status == 'cancelled' %}
+                            <span class="badge bg-danger">
+                                <i class="bi bi-x-circle"></i> Cancelled
+                            </span>
+                            {% endif %}
+                            <br>
+                            <small class="text-muted">
+                                {% if booking.razorpay_payment_id %}
+                                Payment ID: {{ booking.razorpay_payment_id|slice:"0:8" }}...
+                                {% endif %}
+                            </small>
+                        </td>
+                        <td>
+                            <div class="btn-group" role="group">
+                                <a href="{% url 'booking_detail' booking.id %}" class="btn btn-sm btn-outline-primary">
+                                    <i class="bi bi-eye"></i>
+                                </a>
+                                {% if booking.status == 'confirmed' or booking.status == 'pending' %}
+                                <button class="btn btn-sm btn-outline-danger" data-bs-toggle="modal" 
+                                        data-bs-target="#cancelModal{{ booking.id }}">
+                                    <i class="bi bi-x-circle"></i>
+                                </button>
+                                {% endif %}
+                            </div>
+                        </td>
+                    </tr>
+                    
+                    <!-- Cancel Modal for each booking -->
+                    <div class="modal fade" id="cancelModal{{ booking.id }}" tabindex="-1">
+                        <div class="modal-dialog">
+                            <div class="modal-content">
+                                <div class="modal-header bg-danger text-white">
+                                    <h5 class="modal-title">Cancel Booking</h5>
+                                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                                </div>
+                                <div class="modal-body">
+                                    <p>Are you sure you want to cancel this booking?</p>
+                                    <div class="alert alert-warning">
+                                        <strong>Booking Details:</strong><br>
+                                        {{ booking.venue.name }}<br>
+                                        {{ booking.time_slot.date|date:"M d, Y" }} | 
+                                        {{ booking.time_slot.start_time|time:"H:i" }}<br>
+                                        <strong>Amount:</strong> ₹{{ booking.total_price }}
+                                    </div>
+                                    <p>Cancellation may be subject to terms and conditions.</p>
+                                </div>
+                                <div class="modal-footer">
+                                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Keep Booking</button>
+                                    <a href="{% url 'cancel_booking' booking.id %}" class="btn btn-danger">Confirm Cancellation</a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<!-- No Bookings -->
+{% else %}
+<div class="card">
+    <div class="card-body text-center py-5">
+        <div class="display-4 mb-3">📭</div>
+        <h3>No Bookings Yet</h3>
+        <p class="text-muted mb-4">You haven't made any bookings yet. Start exploring venues!</p>
+        <a href="{% url 'venue_list' %}" class="btn btn-primary btn-lg">
+            <i class="bi bi-search me-2"></i>Find Venues
+        </a>
+    </div>
+</div>
+{% endif %}
+
+<!-- Upcoming vs Past -->
+<div class="row mt-4">
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-header bg-success text-white">
+                <h6 class="mb-0"><i class="bi bi-calendar-plus"></i> Upcoming Bookings</h6>
+            </div>
+            <div class="card-body">
+                {% for booking in bookings|slice:":2" %}
+                <div class="d-flex align-items-center mb-3 p-2 border rounded">
+                    <div class="flex-shrink-0">
+                        <div class="bg-success text-white rounded p-2 text-center">
+                            <div class="fw-bold">{{ booking.time_slot.date|date:"d" }}</div>
+                            <small>{{ booking.time_slot.date|date:"M" }}</small>
+                        </div>
+                    </div>
+                    <div class="flex-grow-1 ms-3">
+                        <h6 class="mb-1">{{ booking.venue.name }}</h6>
+                        <small class="text-muted">
+                            {{ booking.time_slot.start_time|time:"H:i" }} | 
+                            {{ booking.venue.sport.get_name_display }}
+                        </small>
+                    </div>
+                    <div class="text-end">
+                        <span class="badge bg-success">₹{{ booking.total_price }}</span>
+                    </div>
+                </div>
+                {% empty %}
+                <div class="text-center py-3">
+                    <small class="text-muted">No upcoming bookings</small>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-header bg-info text-white">
+                <h6 class="mb-0"><i class="bi bi-calendar-check"></i> Booking Tips</h6>
+            </div>
+            <div class="card-body">
+                <ul class="list-unstyled mb-0">
+                    <li class="mb-2">
+                        <i class="bi bi-check-circle text-success"></i>
+                        <small>Book at least 24 hours in advance</small>
+                    </li>
+                    <li class="mb-2">
+                        <i class="bi bi-check-circle text-success"></i>
+                        <small>Check venue rules before booking</small>
+                    </li>
+                    <li class="mb-2">
+                        <i class="bi bi-check-circle text-success"></i>
+                        <small>Cancel at least 6 hours before for refund</small>
+                    </li>
+                    <li class="mb-2">
+                        <i class="bi bi-check-circle text-success"></i>
+                        <small>Keep booking confirmation handy</small>
+                    </li>
+                    <li>
+                        <i class="bi bi-check-circle text-success"></i>
+                        <small>Contact venue owner for special requests</small>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

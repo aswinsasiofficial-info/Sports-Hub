@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Sports Hub{% endblock %}</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.8.1/font/bootstrap-icons.css">
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,100..1000;1,9..40,100..1000&display=swap"
+        rel="stylesheet">
+    <style>
+        body {
+            font-family: 'DM Sans', sans-serif;
+        }
+
+        .navbar-brand {
+            font-weight: bold;
+            color: #2c3e50;
+        }
+
+        .sport-card {
+            transition: transform 0.3s;
+            border: none;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        .sport-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+        }
+
+        .venue-card {
+            height: 100%;
+            border: none;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        .venue-card:hover {
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+        }
+
+        .hero-section {
+            background-image: url(data:image/jpeg;base64,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);
+            background-repeat: no-repeat;
+            background-size: cover;
+            background-position: center;
+            background-attachment: fixed;
+            color: white;
+            border-radius: 10px;
+        }
+
+        .footer {
+            background-color: #000000;
+            padding: 2rem 0;
+            margin-top: 3rem;
+            . border-top: 1px solid #dee2e6;
+        }
+
+        .badge-sport {
+            font-size: 0.8em;
+            padding: 0.4em 0.8em;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border: none;
+        }
+
+        .btn-primary:hover {
+            background: linear-gradient(135deg, #5a6fd8 0%, #6a4190 100%);
+        }
+
+        .card-header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            font-weight: bold;
+        }
+    </style>
+    {% block extra_css %}{% endblock %}
+</head>
+
+<body>
+    <!-- Navigation -->
+    <nav class="navbar navbar-expand-lg navbar-light bg-dark  shadow-sm">
+        <div class="container">
+            <a class="navbar-brand d-flex align-items-center text-white" href="{% url 'home' %}">
+                <span class="fs-4 fw-bold">SPORTS HUB</span>
+            </a>
+
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+
+            <div class="collapse navbar-collapse " id="navbarNav">
+                <ul class="navbar-nav me-auto">
+                    <li class="nav-item">
+                        <a class="nav-link  text-white" href="{% url 'home' %}">Home</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link text-white" href="{% url 'venue_list' %}">Find Venues</a>
+                    </li>
+                    {% if user.is_authenticated and user.user_type == 'owner' %}
+                    <li class="nav-item">
+                        <a class="nav-link text-white" href="{% url 'owner_dashboard' %}">Owner Dashboard</a>
+                    </li>
+                    {% elif user.is_authenticated and user.user_type == 'user' %}
+                    <li class="nav-item">
+                        <a class="nav-link text-white" href="{% url 'my_bookings' %}">My Bookings</a>
+                    </li>
+                    {% endif %}
+                </ul>
+
+                <ul class="navbar-nav ms-auto text-white">
+                    {% if user.is_authenticated %}
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle d-flex align-items-center" href="#" role="button"
+                            data-bs-toggle="dropdown"> {{ user.username }}</a>
+                        <ul class="dropdown-menu">
+                            <li><a class="dropdown-item" href="#">
+                                    <i class="bi bi-person me-2"></i>Profile
+                                </a></li>
+                            <li>
+                                <hr class="dropdown-divider">
+                            </li>
+                            <li><a href="{% url 'logout' %}" class="dropdown-item text-danger">
+                                    <i class="bi bi-box-arrow-right me-2"></i>Logout
+                                </a></li>
+                        </ul>
+                    </li>
+                    {% else %}
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'login' %}">
+                            <i class="bi bi-box-arrow-in-right"></i> Login
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="btn btn-primary ms-2" href="{% url 'signup' %}">
+                            <i class="bi bi-person-plus"></i> Sign Up
+                        </a>
+                    </li>
+                    <li class="nav-item ms-2">
+                        <a class="btn btn-outline-primary" href="{% url 'owner_login' %}">
+                            <i class="bi bi-shield-lock"></i> Owner Login
+                        </a>
+                    </li>
+                    {% endif %}
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Messages -->
+    {% if messages %}
+    <div class="container mt-3">
+        {% for message in messages %}
+        <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+            <i class="bi bi-info-circle me-2"></i>
+            {{ message }}
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+        {% endfor %}
+    </div>
+    {% endif %}
+
+    <!-- Content -->
+    <main class="container my-4">
+        {% block content %}{% endblock %}
+    </main>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <div class="row">
+                <div class="col-md-4 mb-4">
+                    <h5 class="fw-bold text-white">Sports Hub</h5>
+                    <p class="text-white">Book Your Game, Anytime, Anywhere</p>
+                    <p class="text-white">Find and book premium sports venues near you.</p>
+                </div>
+                <div class="col-md-4 mb-4">
+                    <h6 class="text-white">Quick Links</h6>
+                    <ul class="list-unstyled">
+                        <li><a href="{% url 'home' %}" class="text-decoration-none text-white">Home</a></li>
+                        <li><a href="{% url 'venue_list' %}" class="text-decoration-none text-white">Find Venues</a>
+                        </li>
+                        <li><a href="{% url 'login' %}" class="text-decoration-none text-white">Login</a></li>
+                        <li><a href="{% url 'signup' %}" class="text-decoration-none text-white">Sign Up</a></li>
+                    </ul>
+                </div>
+                <div class="col-md-4 mb-4">
+                    <h6 class="text-white">Sports</h6>
+                    <div class="d-flex flex-wrap">
+                        <span class="badge bg-light text-dark me-2 mb-2">🏸 Badminton</span>
+                        <span class="badge bg-light text-dark me-2 mb-2">🏏 Cricket</span>
+                        <span class="badge bg-light text-dark me-2 mb-2">⚽ Football</span>
+                        <span class="badge bg-light text-dark me-2 mb-2">🎾 Tennis</span>
+                        <span class="badge bg-light text-dark me-2 mb-2">🏊 Swimming</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Scripts -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+    {% block extra_js %}{% endblock %}
+</body>
+
+</html>

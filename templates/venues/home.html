@@ -1,0 +1,134 @@
+{% extends 'base.html' %}
+
+{% block title %}Home - Sports Hub{% endblock %}
+
+{% block content %}
+<!-- Hero Section -->
+<section class="hero-section text-center py-5 rounded mb-5">
+    <h1 class="display-4 fw-bold mb-3">Sports Hub</h1>
+    <p class="lead fs-4 mb-3">Book Your Game, Anytime, Anywhere</p>
+    <p class="mb-4 fs-5">Find and book premium sports venues near you. From badminton courts to swimming pools.</p>
+    <a href="{% url 'venue_list' %}" class="btn btn-light btn-lg px-4">
+        <i class="bi bi-search me-2"></i>Explore Venues →
+    </a>
+</section>
+
+<!-- Sports Categories -->
+<section class="mb-5">
+    <h2 class="text-center mb-3">Choose Your Sport</h2>
+    <p class="text-center text-muted mb-4">Select from our wide range of sports facilities</p>
+    
+    <div class="row g-4">
+        {% for sport in sports %}
+        <div class="col-md-2 col-sm-4 col-6">
+            <a href="{% url 'sport_venues' sport.name %}" class="text-decoration-none">
+                <div class="card sport-card text-center p-3 h-100">
+                    <div class="display-6 mb-2">
+                        {% if sport.icon and sport.icon.url %}
+                            <img src="{{ sport.icon.url }}" alt="{{ sport.name }}" 
+                                 style="width: 50px; height: 50px; object-fit: contain;">
+                        {% else %}
+                            {{ sport.icon_url }}
+                        {% endif %}
+                    </div>
+                    <h6 class="card-title">{{ sport.get_name_display }}</h6>
+                </div>
+            </a>
+        </div>
+        {% endfor %}
+    </div>
+</section>
+<!-- How It Works -->
+<section class="mb-5">
+    <h2 class="text-center mb-3">How It Works</h2>
+    <p class="text-center text-muted mb-4">Simple steps to book your favorite sports venue</p>
+
+    <div class="row g-4">
+        <div class="col-md-4">
+            <div class="card h-100 text-center p-4 border-primary">
+                <div class="display-6 mb-3 text-primary">1️⃣</div>
+                <h4 class="text-primary">Find a Venue</h4>
+                <p class="text-muted">Browse sports venues by location and sport type</p>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card h-100 text-center p-4 border-success">
+                <div class="display-6 mb-3 text-success">2️⃣</div>
+                <h4 class="text-success">Select Time Slot</h4>
+                <p class="text-muted">Choose your preferred date and time slot</p>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card h-100 text-center p-4 border-warning">
+                <div class="display-6 mb-3 text-warning">3️⃣</div>
+                <h4 class="text-warning">Book & Play</h4>
+                <p class="text-muted">Secure your booking with instant confirmation</p>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Featured Venues -->
+{% if featured_venues %}
+<section class="mt-5">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2>Featured Venues</h2>
+        <a href="{% url 'venue_list' %}" class="btn btn-outline-primary">
+            View All <i class="bi bi-arrow-right"></i>
+        </a>
+    </div>
+
+    <div class="row g-4">
+        {% for venue in featured_venues %}
+        <div class="col-md-4">
+            <div class="card venue-card">
+                <div class="position-relative">
+                    <img src="{{ venue.image_url }}" class="card-img-top" alt="{{ venue.name }}"
+                        style="height: 200px; object-fit: cover;">
+                    <span class="position-absolute top-0 end-0 m-2 badge bg-primary">
+                        ₹{{ venue.price_per_hour }}/hr
+                    </span>
+                </div>
+                <div class="card-body">
+                    <h5 class="card-title">{{ venue.name }}</h5>
+                    <p class="card-text">
+                        <span class="badge bg-light text-dark">{{ venue.sport.get_name_display }}</span>
+                        <small class="d-block text-muted mt-2">
+                            <i class="bi bi-geo-alt"></i> {{ venue.address|truncatechars:40 }}
+                        </small>
+                    </p>
+                    <div class="d-flex justify-content-between align-items-center">
+                        <span class="text-muted small">
+                            <i class="bi bi-person"></i> {{ venue.owner.username }}
+                        </span>
+                        <a href="{% url 'venue_detail' venue.id %}" class="btn btn-primary btn-sm">
+                            <i class="bi bi-eye"></i> View Details
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+</section>
+{% endif %}
+
+<!-- Testimonial -->
+<section class="mt-5 py-5 bg-light rounded">
+    <div class="text-center">
+        <h2 class="mb-4">Why Choose Sports Hub?</h2>
+        <div class="row justify-content-center">
+            <div class="col-md-8">
+                <div class="card border-0 bg-transparent">
+                    <div class="card-body">
+                        <i class="bi bi-quote display-4 text-muted"></i>
+                        <p class="fs-5 text-muted">"Sports Hub made booking our weekly football match so easy!
+                            Great selection of venues and simple booking process."</p>
+                        <p class="fw-bold">- Alex, Regular User</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}

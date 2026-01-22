@@ -1,0 +1,447 @@
+{% extends 'base.html' %}
+
+{% block title %}Owner Dashboard - Sports Hub{% endblock %}
+
+{% block extra_css %}
+<style>
+    .stat-card {
+        border: none;
+        border-radius: 10px;
+        transition: transform 0.3s;
+    }
+    .stat-card:hover {
+        transform: translateY(-5px);
+    }
+    .revenue-card {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+    }
+    .booking-card {
+        background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+        color: white;
+    }
+    .venue-card {
+        background: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%);
+        color: white;
+    }
+    .user-card {
+        background: linear-gradient(135deg, #fa709a 0%, #fee140 100%);
+        color: white;
+    }
+    .dashboard-nav .nav-link {
+        border-radius: 8px;
+        margin-bottom: 5px;
+    }
+    .dashboard-nav .nav-link.active {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+    }
+    .chart-container {
+        background: white;
+        border-radius: 10px;
+        padding: 20px;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="row">
+    <!-- Sidebar -->
+    <div class="col-md-3 mb-4">
+        <div class="card shadow-sm">
+            <div class="card-header bg-success text-white">
+                <h6 class="mb-0"><i class="bi bi-menu-button-wide"></i> Dashboard Menu</h6>
+            </div>
+            <div class="card-body p-0">
+                <nav class="nav flex-column dashboard-nav p-3">
+                    <a href="#" class="nav-link active">
+                        <i class="bi bi-speedometer2 me-2"></i> Overview
+                    </a>
+                    <a href="#" class="nav-link">
+                        <i class="bi bi-house me-2"></i> My Venues
+                    </a>
+                    <a href="#" class="nav-link">
+                        <i class="bi bi-calendar-check me-2"></i> Bookings
+                    </a>
+                    <a href="#" class="nav-link">
+                        <i class="bi bi-graph-up me-2"></i> Analytics
+                    </a>
+                    <a href="#" class="nav-link">
+                        <i class="bi bi-cash-stack me-2"></i> Revenue
+                    </a>
+                    <a href="#" class="nav-link">
+                        <i class="bi bi-gear me-2"></i> Settings
+                    </a>
+                </nav>
+            </div>
+        </div>
+        
+        <!-- Quick Actions -->
+        <div class="card shadow-sm mt-3">
+            <div class="card-header bg-primary text-white">
+                <h6 class="mb-0"><i class="bi bi-lightning-charge"></i> Quick Actions</h6>
+            </div>
+            <div class="card-body p-3">
+                <button class="btn btn-success w-100 mb-2" data-bs-toggle="modal" data-bs-target="#addVenueModal">
+                    <i class="bi bi-plus-circle"></i> Add New Venue
+                </button>
+                <button class="btn btn-outline-primary w-100 mb-2">
+                    <i class="bi bi-clock"></i> Manage Time Slots
+                </button>
+                <button class="btn btn-outline-success w-100 mb-2">
+                    <i class="bi bi-pencil"></i> Edit Profile
+                </button>
+                <button class="btn btn-outline-info w-100">
+                    <i class="bi bi-download"></i> Export Data
+                </button>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Main Content -->
+    <div class="col-md-9">
+        <!-- Welcome Card -->
+        <div class="card shadow-sm mb-4">
+            <div class="card-body">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                        <h4 class="mb-1">Welcome back, {{ user.username }}! 👑</h4>
+                        <p class="text-muted mb-0">Here's what's happening with your venues today.</p>
+                    </div>
+                    <div class="text-end">
+                        <div class="display-6">🏟️</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Stats Cards -->
+        <div class="row g-4 mb-4">
+            <div class="col-md-3 col-sm-6">
+                <div class="card stat-card revenue-card shadow">
+                    <div class="card-body">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <div>
+                                <h6 class="mb-0">Total Revenue</h6>
+                                <h3 class="mt-2 mb-0">₹{% if total_bookings %}{{ total_bookings|add:"0"|mul:500 }}{% else %}0{% endif %}</h3>
+                                <small>All time</small>
+                            </div>
+                            <div class="display-6">
+                                <i class="bi bi-cash-coin"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-md-3 col-sm-6">
+                <div class="card stat-card booking-card shadow">
+                    <div class="card-body">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <div>
+                                <h6 class="mb-0">Total Bookings</h6>
+                                <h3 class="mt-2 mb-0">{{ total_bookings }}</h3>
+                                <small>All venues</small>
+                            </div>
+                            <div class="display-6">
+                                <i class="bi bi-calendar-check"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-md-3 col-sm-6">
+                <div class="card stat-card venue-card shadow">
+                    <div class="card-body">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <div>
+                                <h6 class="mb-0">Active Venues</h6>
+                                <h3 class="mt-2 mb-0">{{ total_venues }}</h3>
+                                <small>{{ venues.count }} listed</small>
+                            </div>
+                            <div class="display-6">
+                                <i class="bi bi-house-door"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-md-3 col-sm-6">
+                <div class="card stat-card user-card shadow">
+                    <div class="card-body">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <div>
+                                <h6 class="mb-0">This Month</h6>
+                                <h3 class="mt-2 mb-0">₹{% if bookings %}{{ bookings.count|add:"0"|mul:250 }}{% else %}0{% endif %}</h3>
+                                <small>Monthly revenue</small>
+                            </div>
+                            <div class="display-6">
+                                <i class="bi bi-graph-up-arrow"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Daily Orders Chart -->
+        <div class="card shadow-sm mb-4">
+            <div class="card-header bg-info text-white d-flex justify-content-between align-items-center">
+                <h6 class="mb-0"><i class="bi bi-bar-chart"></i> Daily Orders (Last 7 Days)</h6>
+                <select class="form-select form-select-sm w-auto">
+                    <option>Last 7 Days</option>
+                    <option>Last 30 Days</option>
+                    <option>This Month</option>
+                </select>
+            </div>
+            <div class="card-body">
+                {% if daily_orders %}
+                <div class="chart-container">
+                    <div class="table-responsive">
+                        <table class="table table-hover">
+                            <thead class="table-light">
+                                <tr>
+                                    <th>Date</th>
+                                    <th>Bookings</th>
+                                    <th>Revenue</th>
+                                    <th>Trend</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for order in daily_orders %}
+                                <tr>
+                                    <td>{{ order.booking_date__date|date:"M d, Y" }}</td>
+                                    <td>
+                                        <strong>{{ order.count }}</strong> bookings
+                                    </td>
+                                    <td class="text-success fw-bold">
+                                        ₹{{ order.count|add:"0"|mul:500 }}
+                                    </td>
+                                    <td>
+                                        {% if order.count > 2 %}
+                                        <span class="badge bg-success">High</span>
+                                        {% elif order.count > 0 %}
+                                        <span class="badge bg-warning">Medium</span>
+                                        {% else %}
+                                        <span class="badge bg-secondary">Low</span>
+                                        {% endif %}
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+                {% else %}
+                <div class="text-center py-5">
+                    <div class="display-4 mb-3">📊</div>
+                    <h5>No data available</h5>
+                    <p class="text-muted">Start getting bookings to see analytics here.</p>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+        
+        <!-- Recent Bookings -->
+        <div class="card shadow-sm mb-4">
+            <div class="card-header bg-success text-white d-flex justify-content-between align-items-center">
+                <h6 class="mb-0"><i class="bi bi-clock-history"></i> Recent Bookings</h6>
+                <a href="#" class="btn btn-light btn-sm">View All</a>
+            </div>
+            <div class="card-body">
+                {% if bookings %}
+                <div class="table-responsive">
+                    <table class="table table-hover">
+                        <thead class="table-light">
+                            <tr>
+                                <th>Booking ID</th>
+                                <th>Customer</th>
+                                <th>Venue</th>
+                                <th>Date & Time</th>
+                                <th>Amount</th>
+                                <th>Status</th>
+                                <th>Action</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for booking in bookings|slice:":5" %}
+                            <tr>
+                                <td>
+                                    <strong>#{{ booking.id }}</strong>
+                                </td>
+                                <td>
+                                    <div class="d-flex align-items-center">
+                                        <div class="me-2">
+                                            <i class="bi bi-person-circle"></i>
+                                        </div>
+                                        <div>
+                                            <strong>{{ booking.user.username }}</strong>
+                                            <br>
+                                            <small class="text-muted">{{ booking.user.email|truncatechars:20 }}</small>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td>
+                                    <strong>{{ booking.venue.name }}</strong>
+                                    <br>
+                                    <small class="text-muted">{{ booking.venue.sport.get_name_display }}</small>
+                                </td>
+                                <td>
+                                    {{ booking.time_slot.date|date:"M d" }}
+                                    <br>
+                                    <small class="text-muted">{{ booking.time_slot.start_time|time:"H:i" }}</small>
+                                </td>
+                                <td class="fw-bold text-success">
+                                    ₹{{ booking.total_price }}
+                                </td>
+                                <td>
+                                    {% if booking.status == 'confirmed' %}
+                                    <span class="badge bg-success">Confirmed</span>
+                                    {% elif booking.status == 'pending' %}
+                                    <span class="badge bg-warning">Pending</span>
+                                    {% elif booking.status == 'cancelled' %}
+                                    <span class="badge bg-danger">Cancelled</span>
+                                    {% else %}
+                                    <span class="badge bg-secondary">{{ booking.status }}</span>
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    <button class="btn btn-sm btn-outline-primary">
+                                        <i class="bi bi-eye"></i>
+                                    </button>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                {% else %}
+                <div class="text-center py-4">
+                    <div class="display-4 mb-3">📭</div>
+                    <h5>No bookings yet</h5>
+                    <p class="text-muted">When you get bookings, they'll appear here.</p>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+        
+        <!-- My Venues -->
+        <div class="card shadow-sm">
+            <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
+                <h6 class="mb-0"><i class="bi bi-house"></i> My Venues</h6>
+                <span class="badge bg-light text-dark">{{ venues.count }} venues</span>
+            </div>
+            <div class="card-body">
+                {% if venues %}
+                <div class="row g-3">
+                    {% for venue in venues|slice:":3" %}
+                    <div class="col-md-4">
+                        <div class="card h-100">
+                            <img src="{{ venue.image_url }}" class="card-img-top" alt="{{ venue.name }}"
+                                 style="height: 150px; object-fit: cover;">
+                            <div class="card-body">
+                                <h6 class="card-title">{{ venue.name|truncatechars:20 }}</h6>
+                                <p class="card-text small">
+                                    <span class="badge bg-info">{{ venue.sport.get_name_display }}</span>
+                                    <br>
+                                    <small class="text-muted">{{ venue.address|truncatechars:30 }}</small>
+                                </p>
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <span class="fw-bold">₹{{ venue.price_per_hour }}/hr</span>
+                                    <a href="{% url 'venue_detail' venue.id %}" class="btn btn-sm btn-outline-primary">
+                                        View
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+                {% if venues.count > 3 %}
+                <div class="text-center mt-3">
+                    <a href="#" class="btn btn-outline-primary">View All Venues</a>
+                </div>
+                {% endif %}
+                {% else %}
+                <div class="text-center py-4">
+                    <div class="display-4 mb-3">🏟️</div>
+                    <h5>No venues added yet</h5>
+                    <p class="text-muted">Start by adding your first venue.</p>
+                    <button class="btn btn-success" data-bs-toggle="modal" data-bs-target="#addVenueModal">
+                        <i class="bi bi-plus-circle"></i> Add Your First Venue
+                    </button>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Add Venue Modal -->
+<div class="modal fade" id="addVenueModal" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header bg-success text-white">
+                <h5 class="modal-title"><i class="bi bi-plus-circle"></i> Add New Venue</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+            </div>
+            <form method="post" action="{% url 'owner_dashboard' %}" enctype="multipart/form-data">
+                {% csrf_token %}
+                <div class="modal-body">
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">Venue Name</label>
+                            <input type="text" class="form-control" name="name" placeholder="e.g., City Sports Arena" required>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">Sport Type</label>
+                            <select class="form-select" name="sport" required>
+                                <option value="">Select Sport</option>
+                                <option value="badminton">🏸 Badminton</option>
+                                <option value="cricket">🏏 Cricket</option>
+                                <option value="football">⚽ Football</option>
+                                <option value="tennis">🎾 Tennis</option>
+                                <option value="swimming">🏊 Swimming</option>
+                            </select>
+                        </div>
+                    </div>
+                    
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">Price per Hour (₹)</label>
+                            <input type="number" class="form-control" name="price" placeholder="e.g., 500" min="0" step="10" required>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">Venue Image</label>
+                            <input type="file" class="form-control" name="image" accept="image/*">
+                            <small class="text-muted">Recommended size: 800x600px</small>
+                        </div>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label class="form-label">Address</label>
+                        <textarea class="form-control" name="address" rows="3" placeholder="Full venue address..." required></textarea>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label class="form-label">Location (Google Maps Link)</label>
+                        <input type="url" class="form-control" name="location" placeholder="https://maps.google.com/...">
+                    </div>
+                    
+                    <div class="alert alert-info">
+                        <i class="bi bi-info-circle"></i>
+                        You can add time slots for this venue after creation.
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="submit" class="btn btn-success">Add Venue</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}
