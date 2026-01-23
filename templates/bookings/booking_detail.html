@@ -18,7 +18,7 @@
             <div class="card-body">
                 <div class="row">
                     <div class="col-md-6">
-                        <h6><i class="bi bi-info-circle text-primary"></i> Booking Information</h6>
+                        <h6>Booking Information</h6>
                         <table class="table table-sm">
                             <tr>
                                 <td><strong>Booking ID:</strong></td>
@@ -58,10 +58,10 @@
                         <div class="card bg-light">
                             <div class="card-body text-center">
                                 <div class="display-4 mb-2">
-                                    <i class="bi bi-calendar-date"></i>
+                                    <i class="bi bi-calendar3"></i>
                                 </div>
-                                <h5>{{ booking.time_slot.date|date:"l, F d, Y" }}</h5>
-                                <h4 class="text-success">
+                                <h5 class="fw-bold">{{ booking.time_slot.date|date:"l, F d, Y" }}</h5>
+                                <h4 class="text-dark fw-bold">
                                     {{ booking.time_slot.start_time|time:"H:i" }} - {{ booking.time_slot.end_time|time:"H:i" }}
                                 </h4>
                                 <p class="text-muted mb-0">1 hour session</p>
@@ -195,22 +195,22 @@
             <div class="card-body">
                 <div class="d-grid gap-2">
                     {% if booking.status == 'confirmed' %}
-                    <button class="btn btn-success">
+                    <button class="btn btn-success rounded-pill">
                         <i class="bi bi-download"></i> Download Invoice
                     </button>
                     {% endif %}
                     
                     {% if booking.status == 'confirmed' or booking.status == 'pending' %}
-                    <button class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#cancelModal">
+                    <button class="btn btn-danger rounded-pill" data-bs-toggle="modal" data-bs-target="#cancelModal">
                         <i class="bi bi-x-circle"></i> Cancel Booking
                     </button>
                     {% endif %}
                     
-                    <a href="{% url 'my_bookings' %}" class="btn btn-outline-primary">
+                    <a href="{% url 'my_bookings' %}" class="btn btn-outline-primary rounded-pill">
                         <i class="bi bi-arrow-left"></i> Back to Bookings
                     </a>
                     
-                    <a href="{% url 'venue_list' %}" class="btn btn-outline-success">
+                    <a href="{% url 'venue_list' %}" class="btn btn-outline-success rounded-pill">
                         <i class="bi bi-plus-circle"></i> Book Another Venue
                     </a>
                 </div>
