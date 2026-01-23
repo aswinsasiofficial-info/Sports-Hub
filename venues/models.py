@@ -12,6 +12,7 @@ class Sport(models.Model):
         ('football', 'Football'),
         ('tennis', 'Tennis'),
         ('swimming', 'Swimming'),
+        ('boxing', 'Boxing'),
     )
     
     name = models.CharField(max_length=20, choices=SPORT_CHOICES, unique=True)

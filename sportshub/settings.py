@@ -117,8 +117,8 @@ LOGIN_REDIRECT_URL = 'home'
 LOGOUT_REDIRECT_URL = 'home'
 
 # Razorpay settings (Test mode)
-RAZORPAY_KEY_ID = 'rzp_test_XXXXXXXXXXXXXXXX'
-RAZORPAY_KEY_SECRET = 'XXXXXXXXXXXXXXXXXXXXXXXX'
+RAZORPAY_KEY_ID = "rzp_test_RoylMBirQpk7kE"
+RAZORPAY_KEY_SECRET = "BuzlLQ6ch8wkIL4uNh0JN0qj"
 
 # Default primary key field type
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
