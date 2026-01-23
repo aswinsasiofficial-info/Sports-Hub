@@ -20,6 +20,7 @@
     <style>
         body {
             font-family: 'DM Sans', sans-serif;
+            background-color: #FFF;
         }
 
         .navbar-brand {
@@ -53,7 +54,6 @@
             background-repeat: no-repeat;
             background-size: cover;
             background-position: center;
-            background-attachment: fixed;
             color: white;
             border-radius: 10px;
             width: 100%;
@@ -64,11 +64,34 @@
             font-family: "BBH Bogle", sans-serif;
         }
 
-        .footer {
-            background-color: #000000;
-            padding: 2rem 0;
-            margin-top: 3rem;
-            . border-top: 1px solid #dee2e6;
+        .hover-white:hover {
+            color: white !important;
+            transform: translateX(5px);
+            transition: all 0.3s ease;
+        }
+
+        .hover-badge:hover {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%) !important;
+            color: white !important;
+            transform: translateY(-2px);
+            transition: all 0.3s ease;
+        }
+        
+        .border-white-20 {
+            border-color: rgba(255, 255, 255, 0.2) !important;
+        }
+
+        .text-white-50 {
+            color: rgba(255, 255, 255, 0.7) !important;
+        }
+
+        .social-icons a {
+            transition: all 0.3s ease;
+        }
+
+        .social-icons a:hover {
+            color: #667eea !important;
+            transform: translateY(-3px);
         }
 
         .badge-sport {
@@ -128,10 +151,10 @@
                 <ul class="navbar-nav ms-auto text-white">
                     {% if user.is_authenticated %}
                     <li class="nav-item dropdown">
-                        <a class="nav-link dropdown-toggle d-flex align-items-center" href="#" role="button"
+                        <a class="nav-link dropdown-toggle d-flex align-items-center text-white" href="#" role="button"
                             data-bs-toggle="dropdown"> {{ user.username }}</a>
                         <ul class="dropdown-menu">
-                            <li><a class="dropdown-item" href="#">
+                            <li><a class="dropdown-item" href="{% url 'profile' %}">
                                     <i class="bi bi-person me-2"></i>Profile
                                 </a></li>
                             <li>
@@ -178,37 +201,89 @@
     </main>
 
     <!-- Footer -->
-    <footer class="footer">
-        <div class="container">
+    <footer class="footer" style="background: linear-gradient(to bottom, #2b2a2a 0%, #000000 100%);">
+        <div class="container py-5">
             <div class="row">
-                <div class="col-md-4 mb-4">
-                    <h5 class="fw-bold text-white">Sports Hub</h5>
-                    <p class="text-white">Book Your Game, Anytime, Anywhere</p>
-                    <p class="text-white">Find and book premium sports venues near you.</p>
+                <div class="col-lg-4 mb-5 mb-lg-0">
+                    <div class="footer-brand mb-4">
+                        <h3 class="fw-bold text-white mb-3">🏟️ Sports Hub</h3>
+                        <p class="text-white-50 mb-4">Book Your Game, Anytime, Anywhere. Find and book premium sports
+                            venues near you.</p>
+                        <div class="social-icons">
+                            <a href="#" class="text-white me-3"><i class="bi bi-facebook fs-5"></i></a>
+                            <a href="#" class="text-white me-3"><i class="bi bi-twitter fs-5"></i></a>
+                            <a href="#" class="text-white me-3"><i class="bi bi-instagram fs-5"></i></a>
+                            <a href="#" class="text-white"><i class="bi bi-linkedin fs-5"></i></a>
+                        </div>
+                    </div>
                 </div>
-                <div class="col-md-4 mb-4">
-                    <h6 class="text-white">Quick Links</h6>
+
+                <div class="col-lg-2 col-md-4 mb-4 mb-md-0">
+                    <h6 class="text-white fw-bold mb-4">Quick Links</h6>
                     <ul class="list-unstyled">
-                        <li><a href="{% url 'home' %}" class="text-decoration-none text-white">Home</a></li>
-                        <li><a href="{% url 'venue_list' %}" class="text-decoration-none text-white">Find Venues</a>
-                        </li>
-                        <li><a href="{% url 'login' %}" class="text-decoration-none text-white">Login</a></li>
-                        <li><a href="{% url 'signup' %}" class="text-decoration-none text-white">Sign Up</a></li>
+                        <li class="mb-2"><a href="{% url 'home' %}"
+                                class="text-white-50 text-decoration-none hover-white">Home</a></li>
+                        <li class="mb-2"><a href="{% url 'venue_list' %}"
+                                class="text-white-50 text-decoration-none hover-white">Find Venues</a></li>
+                        <li class="mb-2"><a href="{% url 'my_bookings' %}"
+                                class="text-white-50 text-decoration-none hover-white">My Bookings</a></li>
+                        <li><a href="{% url 'owner_dashboard' %}"
+                                class="text-white-50 text-decoration-none hover-white">Owner Dashboard</a></li>
                     </ul>
                 </div>
-                <div class="col-md-4 mb-4">
-                    <h6 class="text-white">Sports</h6>
-                    <div class="d-flex flex-wrap">
-                        <span class="badge bg-light text-dark me-2 mb-2">🏸 Badminton</span>
-                        <span class="badge bg-light text-dark me-2 mb-2">🏏 Cricket</span>
-                        <span class="badge bg-light text-dark me-2 mb-2">⚽ Football</span>
-                        <span class="badge bg-light text-dark me-2 mb-2">🎾 Tennis</span>
-                        <span class="badge bg-light text-dark me-2 mb-2">🏊 Swimming</span>
+
+                <div class="col-lg-3 col-md-4 mb-4 mb-md-0">
+                    <h6 class="text-white fw-bold mb-4">Account</h6>
+                    <ul class="list-unstyled">
+                        <li class="mb-2"><a href="{% url 'login' %}"
+                                class="text-white-50 text-decoration-none hover-white">Login</a></li>
+                        <li class="mb-2"><a href="{% url 'signup' %}"
+                                class="text-white-50 text-decoration-none hover-white">Sign Up</a></li>
+                        <li class="mb-2"><a href="{% url 'profile' %}"
+                                class="text-white-50 text-decoration-none hover-white">My Profile</a></li>
+                        <li><a href="#" class="text-white-50 text-decoration-none hover-white">Help Center</a></li>
+                    </ul>
+                </div>
+
+                <div class="col-lg-3 col-md-4">
+                    <h6 class="text-white fw-bold mb-4">Popular Sports</h6>
+                    <div class="d-flex flex-wrap gap-2">
+                        <a href="{% url 'sport_venues' 'badminton' %}"
+                            class="badge bg-white text-dark px-3 py-2 text-decoration-none hover-badge">🏸 Badminton</a>
+                        <a href="{% url 'sport_venues' 'cricket' %}"
+                            class="badge bg-white text-dark px-3 py-2 text-decoration-none hover-badge">🏏 Cricket</a>
+                        <a href="{% url 'sport_venues' 'football' %}"
+                            class="badge bg-white text-dark px-3 py-2 text-decoration-none hover-badge">⚽ Football</a>
+                        <a href="{% url 'sport_venues' 'tennis' %}"
+                            class="badge bg-white text-dark px-3 py-2 text-decoration-none hover-badge">🎾 Tennis</a>
+                        <a href="{% url 'sport_venues' 'swimming' %}"
+                            class="badge bg-white text-dark px-3 py-2 text-decoration-none hover-badge">🏊 Swimming</a>
                     </div>
+                </div>
+            </div>
+
+            <hr class="my-5 border-white-20">
+
+            <div class="row align-items-center">
+                <div class="col-md-6 mb-3 mb-md-0">
+                    <p class="text-white-50 mb-0">&copy; {% now "Y" %} Sports Hub. All rights reserved.</p>
+                </div>
+                <div class="col-md-6 text-md-end">
+                    <ul class="list-inline mb-0">
+                        <li class="list-inline-item"><a href="#" class="text-white-50 text-decoration-none">Privacy
+                                Policy</a></li>
+                        <li class="list-inline-item mx-3">•</li>
+                        <li class="list-inline-item"><a href="#" class="text-white-50 text-decoration-none">Terms of
+                                Service</a></li>
+                        <li class="list-inline-item mx-3">•</li>
+                        <li class="list-inline-item"><a href="#" class="text-white-50 text-decoration-none">Cookie
+                                Policy</a></li>
+                    </ul>
                 </div>
             </div>
         </div>
     </footer>
+
 
     <!-- Scripts -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
