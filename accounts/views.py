@@ -84,8 +84,13 @@ def owner_dashboard(request):
     venue_ids = venues.values_list('id', flat=True)
     bookings = Booking.objects.filter(venue_id__in=venue_ids).order_by('-booking_date')
     
+    # Calculate total revenue
+    total_revenue = 0
+    for booking in bookings:
+        total_revenue += booking.total_price
+    
     # Calculate daily orders
-    from django.db.models import Count
+    from django.db.models import Count, Sum
     from datetime import datetime, timedelta
     
     today = datetime.now().date()
@@ -95,8 +100,16 @@ def owner_dashboard(request):
         venue_id__in=venue_ids,
         booking_date__date__gte=last_week
     ).values('booking_date__date').annotate(
-        count=Count('id')
+        count=Count('id'),
+        daily_revenue=Sum('total_price')
     ).order_by('booking_date__date')
+    
+    # Calculate monthly revenue
+    monthly_revenue = Booking.objects.filter(
+        venue_id__in=venue_ids,
+        booking_date__month=datetime.now().month,
+        booking_date__year=datetime.now().year
+    ).aggregate(Sum('total_price'))['total_price__sum'] or 0
     
     context = {
         'venues': venues,
@@ -104,6 +117,8 @@ def owner_dashboard(request):
         'daily_orders': daily_orders,
         'total_venues': venues.count(),
         'total_bookings': bookings.count(),
+        'total_revenue': total_revenue,
+        'monthly_revenue': monthly_revenue,
     }
     
     return render(request, 'accounts/owner_dashboard.html', context)
