@@ -4,6 +4,7 @@ from django.contrib.auth.decorators import login_required, user_passes_test
 from django.contrib import messages
 from django.views.decorators.http import require_http_methods
 from .models import User
+from .forms import UserProfileForm
 from venues.models import Venue
 from bookings.models import Booking
 
@@ -69,7 +70,17 @@ def logout_view(request):
 # Profile Views
 @login_required
 def profile(request):
-    return render(request, 'accounts/profile.html', {'user': request.user})
+    """User profile page"""
+    if request.method == 'POST':
+        form = UserProfileForm(request.POST, request.FILES, instance=request.user)
+        if form.is_valid():
+            form.save()  # This saves the data to database
+            messages.success(request, 'Profile updated successfully!')
+            return redirect('profile')
+    else:
+        form = UserProfileForm(instance=request.user)
+    
+    return render(request, 'accounts/profile.html', {'form': form})
 
 def is_owner(user):
     return user.user_type == 'owner'

@@ -2,6 +2,11 @@ from django import forms
 from django.contrib.auth.forms import UserCreationForm
 from .models import User
 
+class UserProfileForm(forms.ModelForm):
+    class Meta:
+        model = User
+        fields = ['first_name', 'last_name', 'email', 'phone_number', 'address']
+
 class UserSignupForm(UserCreationForm):
     USER_TYPE_CHOICES = (
         ('user', 'User'),
