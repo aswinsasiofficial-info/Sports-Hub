@@ -20,12 +20,12 @@
     <style>
         body {
             font-family: 'DM Sans', sans-serif;
-            background-color: #FFF;
+            background-color: #ebebeb;
         }
 
         .navbar-brand {
             font-weight: bold;
-            color: #2c3e50;
+            color: #cbdde9;
         }
 
         .sport-card {
@@ -119,7 +119,7 @@
 
 <body>
     <!-- Navigation -->
-    <nav class="navbar navbar-expand-lg navbar-light bg-dark  shadow-sm">
+    <nav class="navbar navbar-expand-lg navbar-light shadow-sm" style="background-color: #000;">
         <div class="container">
             <a class="navbar-brand d-flex align-items-center text-white" href="{% url 'home' %}">
                 <span class="fs-4 fw-bold">SPORTS HUB</span>
@@ -258,6 +258,8 @@
                             class="badge bg-white text-dark px-3 py-2 text-decoration-none hover-badge">🎾 Tennis</a>
                         <a href="{% url 'sport_venues' 'swimming' %}"
                             class="badge bg-white text-dark px-3 py-2 text-decoration-none hover-badge">🏊 Swimming</a>
+                        <a href="{% url 'sport_venues' 'boxing' %}"
+                            class="badge bg-white text-dark px-3 py-2 text-decoration-none hover-badge">🥊 Boxing</a>
                     </div>
                 </div>
             </div>
