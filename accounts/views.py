@@ -4,7 +4,7 @@ from django.contrib.auth.decorators import login_required, user_passes_test
 from django.contrib import messages
 from django.views.decorators.http import require_http_methods
 from .models import User
-from .forms import UserProfileForm
+from .forms import UserProfileForm, ChangePasswordForm
 from venues.models import Venue
 from bookings.models import Booking
 
@@ -81,6 +81,22 @@ def profile(request):
         form = UserProfileForm(instance=request.user)
     
     return render(request, 'accounts/profile.html', {'form': form})
+
+@login_required
+def change_password(request):
+    """Change user password"""
+    if request.method == 'POST':
+        form = ChangePasswordForm(request.user, request.POST)
+        if form.is_valid():
+            form.save()
+            messages.success(request, 'Your password has been changed successfully!')
+            return redirect('profile')
+        else:
+            messages.error(request, 'Please correct the errors below.')
+    else:
+        form = ChangePasswordForm(request.user)
+    
+    return render(request, 'accounts/change_password.html', {'form': form})
 
 def is_owner(user):
     return user.user_type == 'owner'
