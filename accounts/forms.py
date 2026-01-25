@@ -35,6 +35,28 @@ class OwnerCreationForm(forms.ModelForm):
             user.save()
         return user
 
+class DeleteAccountForm(forms.Form):
+    confirm_username = forms.CharField(
+        max_length=150,
+        widget=forms.TextInput(attrs={'class': 'form-control'}),
+        help_text="Type your username to confirm account deletion"
+    )
+    confirm_deletion = forms.BooleanField(
+        required=True,
+        widget=forms.CheckboxInput(attrs={'class': 'form-check-input'}),
+        help_text="I understand that this action cannot be undone"
+    )
+    
+    def __init__(self, user, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.user = user
+    
+    def clean_confirm_username(self):
+        username = self.cleaned_data.get('confirm_username')
+        if username != self.user.username:
+            raise forms.ValidationError("Username does not match")
+        return username
+
 class ChangePasswordForm(SetPasswordForm):
     """Form for changing user password"""
     

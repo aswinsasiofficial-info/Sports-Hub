@@ -20,6 +20,12 @@ class Booking(models.Model):
     razorpay_payment_id = models.CharField(max_length=100, blank=True, null=True)
     razorpay_signature = models.CharField(max_length=255, blank=True, null=True)
     
+    def save(self, *args, **kwargs):
+        # Set total_price from time_slot's calculated price if not already set
+        if not self.total_price and self.time_slot:
+            self.total_price = self.time_slot.calculated_price
+        super().save(*args, **kwargs)
+    
     def __str__(self):
         return f"Booking #{self.id} - {self.user.username} at {self.venue.name}"
     

@@ -195,9 +195,9 @@
             <div class="card-body">
                 <div class="d-grid gap-2">
                     {% if booking.status == 'confirmed' %}
-                    <button class="btn btn-success rounded-pill">
+                    <a href="{% url 'download_invoice' booking.id %}" class="btn btn-success rounded-pill">
                         <i class="bi bi-download"></i> Download Invoice
-                    </button>
+                    </a>
                     {% endif %}
                     
                     {% if booking.status == 'confirmed' or booking.status == 'pending' %}

@@ -76,7 +76,7 @@
                     <div>
                         <h6 class="mb-0">Total Spent</h6>
                         <h3 class="mt-2 mb-0">
-                            ₹{% if bookings %}{% for booking in bookings %}{{ booking.total_price|add:"0" }}{% endfor %}{% else %}0{% endif %}
+                            ₹{{ total_spent|floatformat:2 }}
                         </h3>
                     </div>
                     <div class="display-6">
@@ -186,6 +186,13 @@
                                 <a href="{% url 'booking_detail' booking.id %}" class="btn btn-sm btn-outline-primary">
                                     <i class="bi bi-eye"></i>
                                 </a>
+                                {% if booking.status == 'confirmed' %}
+                                <a href="{% url 'download_invoice' booking.id %}" 
+                                   class="btn btn-sm btn-outline-success" 
+                                   title="Download Invoice">
+                                    <i class="bi bi-file-earmark-pdf"></i>
+                                </a>
+                                {% endif %}
                                 {% if booking.status == 'confirmed' or booking.status == 'pending' %}
                                 <button class="btn btn-sm btn-outline-danger" data-bs-toggle="modal" 
                                         data-bs-target="#cancelModal{{ booking.id }}">

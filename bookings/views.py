@@ -60,7 +60,17 @@ def create_booking(request):
 @login_required
 def my_bookings(request):
     bookings = Booking.objects.filter(user=request.user).order_by('-booking_date')
-    return render(request, 'bookings/my_bookings.html', {'bookings': bookings})
+    
+    # Calculate total spent on confirmed bookings
+    confirmed_bookings = bookings.filter(status='confirmed')
+    total_spent = sum(booking.total_price for booking in confirmed_bookings)
+    
+    context = {
+        'bookings': bookings,
+        'total_spent': total_spent,
+    }
+    
+    return render(request, 'bookings/my_bookings.html', context)
 
 @login_required
 def booking_detail(request, booking_id):

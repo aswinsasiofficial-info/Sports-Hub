@@ -45,9 +45,19 @@
             <div class="card-body">
                 <div class="row text-center">
                     <div class="col-6 mb-3">
-                        <div class="display-6 text-primary">0</div>
+                        <div class="display-6 text-primary">{{ total_bookings }}</div>
                         <small class="text-muted">Bookings</small>
                     </div>
+                    {% if user.user_type == 'owner' %}
+                    <div class="col-6 mb-3">
+                        <div class="display-6 text-success">{{ owned_venues }}</div>
+                        <small class="text-muted">Owned Venues</small>
+                    </div>
+                    <div class="col-6">
+                        <div class="display-6 text-warning">₹{{ total_revenue|floatformat:2 }}</div>
+                        <small class="text-muted">Total Revenue</small>
+                    </div>
+                    {% else %}
                     <div class="col-6 mb-3">
                         <div class="display-6 text-success">0</div>
                         <small class="text-muted">Venues</small>
@@ -56,9 +66,10 @@
                         <div class="display-6 text-warning">0</div>
                         <small class="text-muted">Reviews</small>
                     </div>
+                    {% endif %}
                     <div class="col-6">
-                        <div class="display-6 text-info">₹0</div>
-                        <small class="text-muted">Spent</small>
+                        <div class="display-6 text-info">₹{{ total_spent|floatformat:2 }}</div>
+                        <small class="text-muted">Total Spent</small>
                     </div>
                 </div>
             </div>
@@ -85,7 +96,7 @@
                         
                         <div class="col-md-6 mb-3">
                             <label class="form-label">Email Address</label>
-                            <input type="email" class="form-control" value="{{ user.email }}" readonly>
+                            <input type="email" class="form-control" name="email" value="{{ user.email|default:'' }}">
                         </div>
                     </div>
                     
@@ -146,29 +157,9 @@
                         </div>
                     </a>
                     
-                    <a href="#" class="list-group-item list-group-item-action">
-                        <div class="d-flex w-100 justify-content-between">
-                            <div>
-                                <i class="bi bi-envelope text-success me-2"></i>
-                                <strong>Email Preferences</strong>
-                                <p class="mb-0 small text-muted">Manage notification settings</p>
-                            </div>
-                            <i class="bi bi-chevron-right"></i>
-                        </div>
-                    </a>
+
                     
-                    <a href="#" class="list-group-item list-group-item-action">
-                        <div class="d-flex w-100 justify-content-between">
-                            <div>
-                                <i class="bi bi-bell text-warning me-2"></i>
-                                <strong>Notification Settings</strong>
-                                <p class="mb-0 small text-muted">Control how we contact you</p>
-                            </div>
-                            <i class="bi bi-chevron-right"></i>
-                        </div>
-                    </a>
-                    
-                    <a href="#" class="list-group-item list-group-item-action">
+                    <a href="{% url 'delete_account' %}" class="list-group-item list-group-item-action">
                         <div class="d-flex w-100 justify-content-between">
                             <div>
                                 <i class="bi bi-trash text-danger me-2"></i>

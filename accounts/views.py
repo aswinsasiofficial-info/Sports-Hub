@@ -3,8 +3,10 @@ from django.contrib.auth import login, authenticate, logout
 from django.contrib.auth.decorators import login_required, user_passes_test
 from django.contrib import messages
 from django.views.decorators.http import require_http_methods
+from django.http import HttpResponse
+from io import BytesIO
 from .models import User
-from .forms import UserProfileForm, ChangePasswordForm
+from .forms import UserProfileForm, ChangePasswordForm, DeleteAccountForm
 from venues.models import Venue
 from bookings.models import Booking
 
@@ -80,7 +82,119 @@ def profile(request):
     else:
         form = UserProfileForm(instance=request.user)
     
-    return render(request, 'accounts/profile.html', {'form': form})
+    # Calculate user statistics
+    from bookings.models import Booking
+    from venues.models import Venue
+    
+    # User stats
+    user_bookings = Booking.objects.filter(user=request.user)
+    total_spent = sum(booking.total_price for booking in user_bookings if booking.status == 'confirmed')
+    total_bookings = user_bookings.count()
+    
+    # Owner stats (if user is owner)
+    owned_venues = 0
+    total_revenue = 0
+    if request.user.user_type == 'owner':
+        owned_venues = Venue.objects.filter(owner=request.user).count()
+        owner_bookings = Booking.objects.filter(venue__owner=request.user)
+        total_revenue = sum(booking.total_price for booking in owner_bookings if booking.status == 'confirmed')
+    
+    context = {
+        'form': form,
+        'total_spent': total_spent,
+        'total_bookings': total_bookings,
+        'owned_venues': owned_venues,
+        'total_revenue': total_revenue,
+    }
+    
+    return render(request, 'accounts/profile.html', context)
+
+@login_required
+def download_invoice(request, booking_id):
+    """Generate and download PDF invoice for a booking"""
+    try:
+        from bookings.models import Booking
+        from django.template.loader import get_template
+        from datetime import datetime
+        
+        # Get booking and verify ownership
+        booking = get_object_or_404(Booking, id=booking_id)
+        
+        # Users can only download their own invoices, owners can download invoices for their venues
+        if request.user != booking.user and not (request.user.user_type == 'owner' and booking.venue.owner == request.user):
+            messages.error(request, 'You do not have permission to access this invoice.')
+            return redirect('profile')
+        
+        # Calculate tax (18% GST)
+        tax_rate = 0.18
+        tax_amount = float(booking.total_price) * tax_rate
+        total_with_tax = float(booking.total_price) + tax_amount
+        
+        # Prepare context
+        context = {
+            'booking': booking,
+            'tax_amount': tax_amount,
+            'total_with_tax': total_with_tax,
+            'current_date': datetime.now(),
+        }
+        
+        # Try to generate PDF if xhtml2pdf is available
+        try:
+            from xhtml2pdf import pisa
+            
+            # Render HTML template
+            template = get_template('accounts/invoice.html')
+            html = template.render(context)
+            
+            # Create PDF
+            result = BytesIO()
+            pdf = pisa.CreatePDF(html, dest=result)
+            
+            if not pdf.err:
+                response = HttpResponse(result.getvalue(), content_type='application/pdf')
+                response['Content-Disposition'] = f'attachment; filename=invoice_{booking.id}.pdf'
+                return response
+            else:
+                # If PDF generation fails, return an error page
+                messages.error(request, 'Error generating PDF invoice. Please try again.')
+                return redirect('profile')
+        except ImportError:
+            # If xhtml2pdf is not available, generate a simple HTML invoice
+            template = get_template('accounts/invoice.html')
+            html = template.render(context)
+            return HttpResponse(html, content_type='text/html')
+            
+    except Exception as e:
+        messages.error(request, f'Error generating invoice: {str(e)}')
+        return redirect('profile')
+
+@login_required
+def delete_account(request):
+    """Delete user account with confirmation"""
+    if request.method == 'POST':
+        form = DeleteAccountForm(request.user, request.POST)
+        if form.is_valid():
+            # Delete all related data first
+            from bookings.models import Booking
+            from venues.models import Venue
+            
+            # Delete user's bookings
+            Booking.objects.filter(user=request.user).delete()
+            
+            # If user is an owner, delete their venues
+            if request.user.user_type == 'owner':
+                Venue.objects.filter(owner=request.user).delete()
+            
+            # Delete the user account
+            username = request.user.username
+            request.user.delete()
+            
+            messages.success(request, f'Account {username} has been permanently deleted.')
+            return redirect('home')
+    else:
+        form = DeleteAccountForm(request.user)
+    
+    return render(request, 'accounts/delete_account.html', {'form': form})
 
 @login_required
 def change_password(request):

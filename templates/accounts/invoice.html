@@ -1,0 +1,246 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>Invoice #{{ booking.id }}</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            font-size: 12px;
+            margin: 0;
+            padding: 20px;
+            color: #333;
+            background: #fff;
+            max-width: 800px;
+            margin: 0 auto;
+        }
+        
+        .invoice-header {
+            text-align: center;
+            margin-bottom: 30px;
+            border-bottom: 2px solid #2c3e50;
+            padding-bottom: 20px;
+        }
+        
+        .invoice-title {
+            font-size: 24px;
+            font-weight: bold;
+            color: #2c3e50;
+            margin-bottom: 5px;
+        }
+        
+        .company-info {
+            font-size: 14px;
+            color: #7f8c8d;
+            margin-bottom: 20px;
+        }
+        
+        .invoice-details {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 30px;
+        }
+        
+        .customer-info, .invoice-meta {
+            width: 48%;
+        }
+        
+        .section-title {
+            font-size: 16px;
+            font-weight: bold;
+            margin-bottom: 10px;
+            color: #2c3e50;
+            border-bottom: 1px solid #e0e0e0;
+            padding-bottom: 5px;
+        }
+        
+        .info-item {
+            margin-bottom: 8px;
+        }
+        
+        .info-label {
+            font-weight: bold;
+            display: inline-block;
+            width: 120px;
+            color: #7f8c8d;
+        }
+        
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 20px;
+            border: 1px solid #e0e0e0;
+        }
+        
+        th, td {
+            border: 1px solid #e0e0e0;
+            padding: 10px;
+            text-align: left;
+        }
+        
+        th {
+            background-color: #f8f9fa;
+            font-weight: bold;
+            color: #2c3e50;
+            font-size: 12px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        
+        .text-right {
+            text-align: right;
+        }
+        
+        .total-section {
+            margin-top: 20px;
+            text-align: right;
+        }
+        
+        .total-row {
+            font-size: 14px;
+            font-weight: bold;
+            padding: 8px 0;
+            border-bottom: 1px solid #e0e0e0;
+        }
+        
+        .grand-total {
+            font-size: 18px;
+            font-weight: bold;
+            background-color: #2c3e50;
+            color: white;
+            padding: 10px;
+            margin-top: 5px;
+            border-top: 2px solid #2c3e50;
+        }
+        
+        .footer {
+            margin-top: 40px;
+            text-align: center;
+            font-size: 10px;
+            color: #7f8c8d;
+            border-top: 1px solid #e0e0e0;
+            padding-top: 10px;
+        }
+        
+        .status-badge {
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-weight: bold;
+            text-transform: uppercase;
+            display: inline-block;
+            font-size: 11px;
+            font-weight: 600;
+            letter-spacing: 0.5px;
+        }
+        
+        .status-confirmed {
+            background-color: #e8f5e8;
+            color: #2e7d32;
+            border: 1px solid #c8e6c9;
+        }
+        
+        .status-pending {
+            background-color: #fff8e1;
+            color: #ff8f00;
+            border: 1px solid #ffe082;
+        }
+        
+        .status-cancelled {
+            background-color: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+    </style>
+</head>
+<body>
+    <div class="invoice-header">
+        <div class="invoice-title">SPORTS HUB</div>
+        <div class="company-info">
+            Your Sports Venue Booking Platform<br>
+            contact@sportshub.com | +91 98765 43210
+        </div>
+        <h2>BOOKING INVOICE</h2>
+    </div>
+
+    <div class="invoice-details">
+        <div class="customer-info">
+            <div class="section-title">Customer Information</div>
+            <div class="info-item">
+                <span class="info-label">Name:</span> {{ booking.user.get_full_name|default:booking.user.username }}
+            </div>
+            <div class="info-item">
+                <span class="info-label">Email:</span> {{ booking.user.email }}
+            </div>
+            <div class="info-item">
+                <span class="info-label">Phone:</span> {{ booking.user.phone_number|default:'N/A' }}
+            </div>
+        </div>
+        
+        <div class="invoice-meta">
+            <div class="section-title">Invoice Details</div>
+            <div class="info-item">
+                <span class="info-label">Invoice #:</span> INV-{{ booking.id|stringformat:"06d" }}
+            </div>
+            <div class="info-item">
+                <span class="info-label">Booking ID:</span> #{{ booking.id }}
+            </div>
+            <div class="info-item">
+                <span class="info-label">Date:</span> {{ booking.booking_date|date:"d M Y" }}
+            </div>
+            <div class="info-item">
+                <span class="info-label">Status:</span> 
+                <span class="status-badge status-{{ booking.status }}">
+                    {{ booking.get_status_display }}
+                </span>
+            </div>
+        </div>
+    </div>
+
+    <div class="section-title">Booking Details</div>
+    <table>
+        <thead>
+            <tr>
+                <th>Venue</th>
+                <th>Sport</th>
+                <th>Date</th>
+                <th>Time</th>
+                <th>Duration</th>
+                <th class="text-right">Unit Price</th>
+                <th class="text-right">Amount</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td>{{ booking.venue.name }}</td>
+                <td>{{ booking.venue.sport.get_name_display }}</td>
+                <td>{{ booking.time_slot.date|date:"d M Y" }}</td>
+                <td>{{ booking.time_slot.start_time|time:"H:i" }} - {{ booking.time_slot.end_time|time:"H:i" }}</td>
+                <td>1 hour</td>
+                <td class="text-right">₹{{ booking.total_price|floatformat:2 }}</td>
+                <td class="text-right">₹{{ booking.total_price|floatformat:2 }}</td>
+            </tr>
+        </tbody>
+    </table>
+
+    <div class="total-section">
+        <div class="total-row">
+            Subtotal: <span class="text-right">₹{{ booking.total_price|floatformat:2 }}</span>
+        </div>
+        <div class="total-row">
+            Tax (GST 18%): <span class="text-right">₹{{ tax_amount|floatformat:2 }}</span>
+        </div>
+        <div class="grand-total">
+            TOTAL: ₹{{ total_with_tax|floatformat:2 }}
+        </div>
+    </div>
+
+    <div class="footer">
+        <p><strong>Terms & Conditions:</strong></p>
+        <p>• All bookings are subject to venue availability</p>
+        <p>• Cancellations must be made 24 hours prior to booking time</p>
+        <p>• This is a computer-generated invoice and does not require signature</p>
+        <p>• Thank you for choosing Sports Hub!</p>
+        <p style="margin-top: 15px;">Invoice generated on {{ current_date|date:"d M Y H:i" }}</p>
+    </div>
+</body>
+</html>
