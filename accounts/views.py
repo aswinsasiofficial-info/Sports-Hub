@@ -218,6 +218,47 @@ def is_owner(user):
 @login_required
 @user_passes_test(is_owner)
 def owner_dashboard(request):
+    if request.method == 'POST':
+        # Handle venue creation
+        from venues.models import Sport
+        
+        name = request.POST.get('name')
+        sport_name = request.POST.get('sport')
+        price = request.POST.get('price')
+        address = request.POST.get('address')
+        location = request.POST.get('location', '')
+        image = request.FILES.get('image')
+        
+        # Validate required fields
+        if not all([name, sport_name, price, address]):
+            messages.error(request, 'Please fill in all required fields.')
+            return redirect('owner_dashboard')
+        
+        try:
+            # Get the sport object
+            sport = Sport.objects.get(name=sport_name)
+            
+            # Create the venue
+            venue = Venue.objects.create(
+                name=name,
+                sport=sport,
+                owner=request.user,
+                address=address,
+                location=location,
+                price_per_hour=price,
+                image=image if image else None
+            )
+            
+            messages.success(request, f'Venue "{venue.name}" has been added successfully!')
+            return redirect('owner_venues')  # Redirect to venues page after creation
+            
+        except Sport.DoesNotExist:
+            messages.error(request, 'Invalid sport selected.')
+            return redirect('owner_dashboard')
+        except Exception as e:
+            messages.error(request, f'Error creating venue: {str(e)}')
+            return redirect('owner_dashboard')
+    
     # Get owner's venues
     venues = Venue.objects.filter(owner=request.user)
     
@@ -268,6 +309,49 @@ def owner_dashboard(request):
 @user_passes_test(is_owner)
 def owner_venues(request):
     """Display all venues owned by the current user"""
+    if request.method == 'POST':
+        # Handle venue creation
+        from venues.models import Sport
+        
+        name = request.POST.get('name')
+        sport_name = request.POST.get('sport')
+        price = request.POST.get('price')
+        address = request.POST.get('address')
+        location = request.POST.get('location', '')
+        image = request.FILES.get('image')
+        is_active = request.POST.get('is_active') == 'on'
+        
+        # Validate required fields
+        if not all([name, sport_name, price, address]):
+            messages.error(request, 'Please fill in all required fields.')
+            return redirect('owner_venues')
+        
+        try:
+            # Get the sport object
+            sport = Sport.objects.get(name=sport_name)
+            
+            # Create the venue
+            venue = Venue.objects.create(
+                name=name,
+                sport=sport,
+                owner=request.user,
+                address=address,
+                location=location,
+                price_per_hour=price,
+                image=image if image else None,
+                is_active=is_active
+            )
+            
+            messages.success(request, f'Venue "{venue.name}" has been added successfully!')
+            return redirect('owner_venues')  # Stay on the same page after creation
+            
+        except Sport.DoesNotExist:
+            messages.error(request, 'Invalid sport selected.')
+            return redirect('owner_venues')
+        except Exception as e:
+            messages.error(request, f'Error creating venue: {str(e)}')
+            return redirect('owner_venues')
+    
     venues = Venue.objects.filter(owner=request.user).order_by('-created_at')
     
     # Calculate venue statistics
