@@ -263,3 +263,36 @@ def owner_dashboard(request):
     }
     
     return render(request, 'accounts/owner_dashboard.html', context)
+
+@login_required
+@user_passes_test(is_owner)
+def owner_venues(request):
+    """Display all venues owned by the current user"""
+    venues = Venue.objects.filter(owner=request.user).order_by('-created_at')
+    
+    # Calculate venue statistics
+    total_venues = venues.count()
+    active_venues = venues.filter(is_active=True).count()
+    inactive_venues = venues.filter(is_active=False).count()
+    
+    # Calculate total bookings and revenue for all venues
+    from django.db.models import Sum
+    from bookings.models import Booking
+    
+    venue_ids = venues.values_list('id', flat=True)
+    total_bookings = Booking.objects.filter(venue_id__in=venue_ids).count()
+    total_revenue = Booking.objects.filter(
+        venue_id__in=venue_ids, 
+        status='confirmed'
+    ).aggregate(Sum('total_price'))['total_price__sum'] or 0
+    
+    context = {
+        'venues': venues,
+        'total_venues': total_venues,
+        'active_venues': active_venues,
+        'inactive_venues': inactive_venues,
+        'total_bookings': total_bookings,
+        'total_revenue': total_revenue,
+    }
+    
+    return render(request, 'accounts/owner_venues.html', context)
