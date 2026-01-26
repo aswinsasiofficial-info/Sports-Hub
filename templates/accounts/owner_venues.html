@@ -91,7 +91,7 @@
                     <a href="{% url 'owner_venues' %}" class="nav-link active">
                         <i class="bi bi-house me-2"></i> My Venues
                     </a>
-                    <a href="#" class="nav-link">
+                    <a href="{% url 'owner_bookings' %}" class="nav-link">
                         <i class="bi bi-calendar-check me-2"></i> Bookings
                     </a>
                     <a href="{% url 'profile' %}" class="nav-link">
@@ -254,17 +254,17 @@
                                     <a href="{% url 'venue_detail' venue.id %}" class="btn btn-sm btn-outline-primary">
                                         <i class="bi bi-eye"></i> View
                                     </a>
-                                    <button class="btn btn-sm btn-outline-warning" onclick="editVenue({{ venue.id }})">
+                                    <button class="btn btn-sm btn-outline-warning edit-btn" data-venue-id="{{ venue.id }}">
                                         <i class="bi bi-pencil"></i> Edit
                                     </button>
                                     {% if venue.is_active %}
-                                    <button class="btn btn-sm btn-outline-secondary"
-                                        onclick="toggleVenueStatus({{ venue.id }}, false)">
+                                    <button class="btn btn-sm btn-outline-secondary toggle-btn"
+                                        data-venue-id="{{ venue.id }}" data-action="deactivate">
                                         <i class="bi bi-power"></i> Deactivate
                                     </button>
                                     {% else %}
-                                    <button class="btn btn-sm btn-outline-success"
-                                        onclick="toggleVenueStatus({{ venue.id }}, true)">
+                                    <button class="btn btn-sm btn-outline-success toggle-btn"
+                                        data-venue-id="{{ venue.id }}" data-action="activate">
                                         <i class="bi bi-power"></i> Activate
                                     </button>
                                     {% endif %}
@@ -396,17 +396,27 @@
 
 {% block extra_js %}
 <script>
-    function editVenue(venueId) {
-        // Placeholder for edit functionality
-        alert('Edit functionality will be implemented soon. Venue ID: ' + venueId);
-    }
+    document.addEventListener('DOMContentLoaded', function() {
+        // Edit venue buttons
+        document.querySelectorAll('.edit-btn').forEach(button => {
+            button.addEventListener('click', function() {
+                const venueId = this.getAttribute('data-venue-id');
+                // Placeholder for edit functionality
+                alert('Edit functionality will be implemented soon. Venue ID: ' + venueId);
+            });
+        });
 
-    function toggleVenueStatus(venueId, activate) {
-        const action = activate ? 'activate' : 'deactivate';
-        if (confirm(`Are you sure you want to ${action} this venue?`)) {
-            // Placeholder for toggle functionality
-            alert(`${action.charAt(0).toUpperCase() + action.slice(1)} functionality will be implemented soon. Venue ID: ` + venueId);
-        }
-    }
+        // Toggle venue status buttons
+        document.querySelectorAll('.toggle-btn').forEach(button => {
+            button.addEventListener('click', function() {
+                const venueId = this.getAttribute('data-venue-id');
+                const action = this.getAttribute('data-action');
+                if (confirm(`Are you sure you want to ${action} this venue?`)) {
+                    // Placeholder for toggle functionality
+                    alert(`${action.charAt(0).toUpperCase() + action.slice(1)} functionality will be implemented soon. Venue ID: ` + venueId);
+                }
+            });
+        });
+    });
 </script>
 {% endblock %}

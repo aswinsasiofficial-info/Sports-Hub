@@ -296,3 +296,44 @@ def owner_venues(request):
     }
     
     return render(request, 'accounts/owner_venues.html', context)
+
+@login_required
+@user_passes_test(is_owner)
+def owner_bookings(request):
+    """Display all bookings for owner's venues"""
+    # Get owner's venues
+    venues = Venue.objects.filter(owner=request.user)
+    venue_ids = venues.values_list('id', flat=True)
+    
+    # Get bookings for all owner's venues
+    bookings = Booking.objects.filter(venue_id__in=venue_ids).order_by('-booking_date')
+    
+    # Calculate statistics
+    from django.db.models import Sum, Count
+    
+    total_bookings = bookings.count()
+    confirmed_bookings = bookings.filter(status='confirmed')
+    pending_bookings = bookings.filter(status='pending')
+    cancelled_bookings = bookings.filter(status='cancelled')
+    
+    total_revenue = confirmed_bookings.aggregate(Sum('total_price'))['total_price__sum'] or 0
+    
+    # Group by status
+    booking_stats = bookings.values('status').annotate(count=Count('id'))
+    
+    # Recent bookings (last 10)
+    recent_bookings = bookings[:10]
+    
+    context = {
+        'bookings': bookings,
+        'recent_bookings': recent_bookings,
+        'total_bookings': total_bookings,
+        'confirmed_count': confirmed_bookings.count(),
+        'pending_count': pending_bookings.count(),
+        'cancelled_count': cancelled_bookings.count(),
+        'total_revenue': total_revenue,
+        'venues': venues,
+        'booking_stats': booking_stats,
+    }
+    
+    return render(request, 'accounts/owner_bookings.html', context)

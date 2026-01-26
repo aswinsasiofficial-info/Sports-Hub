@@ -1,6 +1,6 @@
 {% extends 'base.html' %}
 
-{% block title %}Owner Dashboard - Sports Hub{% endblock %}
+{% block title %}Owner Bookings - Sports Hub{% endblock %}
 
 {% block extra_css %}
 <style>
@@ -14,23 +14,28 @@
         transform: translateY(-5px);
     }
 
-    .revenue-card {
-        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-        color: white;
-    }
-
     .booking-card {
         background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
         color: white;
     }
 
-    .venue-card {
+    .confirmed-card {
         background: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%);
         color: white;
     }
 
-    .user-card {
+    .pending-card {
         background: linear-gradient(135deg, #fa709a 0%, #fee140 100%);
+        color: white;
+    }
+
+    .cancelled-card {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+    }
+
+    .revenue-card {
+        background: linear-gradient(135deg, #f6d365 0%, #fda085 100%);
         color: white;
     }
 
@@ -44,11 +49,26 @@
         color: white;
     }
 
-    .chart-container {
-        background: white;
-        border-radius: 10px;
-        padding: 20px;
-        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    .status-badge {
+        padding: 4px 8px;
+        border-radius: 12px;
+        font-size: 0.8rem;
+        font-weight: 500;
+    }
+
+    .status-confirmed {
+        background-color: #d1fae5;
+        color: #065f46;
+    }
+
+    .status-pending {
+        background-color: #fef3c7;
+        color: #92400e;
+    }
+
+    .status-cancelled {
+        background-color: #fee2e2;
+        color: #991b1b;
     }
 </style>
 {% endblock %}
@@ -63,25 +83,24 @@
             </div>
             <div class="card-body p-0">
                 <nav class="nav flex-column dashboard-nav p-3">
-                    <a href="#" class="nav-link active">
+                    <a href="{% url 'owner_dashboard' %}" class="nav-link">
                         <i class="bi bi-speedometer2 me-2"></i> Overview
                     </a>
                     <a href="{% url 'owner_venues' %}" class="nav-link">
                         <i class="bi bi-house me-2"></i> My Venues
                     </a>
-                    <a href="{% url 'owner_bookings' %}" class="nav-link">
+                    <a href="{% url 'owner_bookings' %}" class="nav-link active">
                         <i class="bi bi-calendar-check me-2"></i> Bookings
                     </a>
                     <a href="{% url 'profile' %}" class="nav-link">
                         <i class="bi bi-pencil"></i> Edit Profile
                     </a>
                     <button class="btn btn-success w-100 mb-2" data-bs-toggle="modal" data-bs-target="#addVenueModal">
-                    <i class="bi bi-plus-circle"></i> Add New Venue
-                </button>
+                        <i class="bi bi-plus-circle"></i> Add New Venue
+                    </button>
                 </nav>
             </div>
         </div>
-
     </div>
 
     <!-- Main Content -->
@@ -91,35 +110,18 @@
             <div class="card-body">
                 <div class="d-flex justify-content-between align-items-center">
                     <div>
-                        <h4 class="mb-1">Welcome back, {{ user.username }}! 👑</h4>
-                        <p class="text-muted mb-0">Here's what's happening with your venues today.</p>
+                        <h4 class="mb-1">Booking Management 📅</h4>
+                        <p class="text-muted mb-0">View and manage all bookings for your venues</p>
                     </div>
                     <div class="text-end">
-                        <div class="display-6">🏟️</div>
+                        <div class="display-6">📋</div>
                     </div>
                 </div>
             </div>
         </div>
 
-        <!-- Stats Cards - FIXED SECTION -->
+        <!-- Stats Cards -->
         <div class="row g-4 mb-4">
-            <div class="col-md-3 col-sm-6">
-                <div class="card stat-card revenue-card shadow">
-                    <div class="card-body">
-                        <div class="d-flex justify-content-between align-items-center">
-                            <div>
-                                <h6 class="mb-0">Total Revenue</h6>
-                                <h3 class="mt-2 mb-0">₹{{ total_revenue|default:"0" }}</h3>
-                                <small>All time</small>
-                            </div>
-                            <div class="display-6">
-                                <i class="bi bi-cash-coin"></i>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
             <div class="col-md-3 col-sm-6">
                 <div class="card stat-card booking-card shadow">
                     <div class="card-body">
@@ -127,7 +129,6 @@
                             <div>
                                 <h6 class="mb-0">Total Bookings</h6>
                                 <h3 class="mt-2 mb-0">{{ total_bookings }}</h3>
-                                <small>All venues</small>
                             </div>
                             <div class="display-6">
                                 <i class="bi bi-calendar-check"></i>
@@ -138,16 +139,15 @@
             </div>
 
             <div class="col-md-3 col-sm-6">
-                <div class="card stat-card venue-card shadow">
+                <div class="card stat-card confirmed-card shadow">
                     <div class="card-body">
                         <div class="d-flex justify-content-between align-items-center">
                             <div>
-                                <h6 class="mb-0">Active Venues</h6>
-                                <h3 class="mt-2 mb-0">{{ total_venues }}</h3>
-                                <small>{{ venues.count }} listed</small>
+                                <h6 class="mb-0">Confirmed</h6>
+                                <h3 class="mt-2 mb-0">{{ confirmed_count }}</h3>
                             </div>
                             <div class="display-6">
-                                <i class="bi bi-house-door"></i>
+                                <i class="bi bi-check-circle"></i>
                             </div>
                         </div>
                     </div>
@@ -155,16 +155,31 @@
             </div>
 
             <div class="col-md-3 col-sm-6">
-                <div class="card stat-card user-card shadow">
+                <div class="card stat-card pending-card shadow">
                     <div class="card-body">
                         <div class="d-flex justify-content-between align-items-center">
                             <div>
-                                <h6 class="mb-0">This Month</h6>
-                                <h3 class="mt-2 mb-0">₹{{ monthly_revenue|default:"0" }}</h3>
-                                <small>Monthly revenue</small>
+                                <h6 class="mb-0">Pending</h6>
+                                <h3 class="mt-2 mb-0">{{ pending_count }}</h3>
                             </div>
                             <div class="display-6">
-                                <i class="bi bi-graph-up-arrow"></i>
+                                <i class="bi bi-clock"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-md-3 col-sm-6">
+                <div class="card stat-card revenue-card shadow">
+                    <div class="card-body">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <div>
+                                <h6 class="mb-0">Total Revenue</h6>
+                                <h3 class="mt-2 mb-0">₹{{ total_revenue }}</h3>
+                            </div>
+                            <div class="display-6">
+                                <i class="bi bi-cash-coin"></i>
                             </div>
                         </div>
                     </div>
@@ -172,69 +187,11 @@
             </div>
         </div>
 
-        <!-- Daily Orders Chart - FIXED SECTION -->
-        <div class="card shadow-sm mb-4">
-            <div class="card-header bg-info text-white d-flex justify-content-between align-items-center">
-                <h6 class="mb-0"><i class="bi bi-bar-chart"></i> Daily Orders (Last 7 Days)</h6>
-                <select class="form-select form-select-sm w-auto">
-                    <option>Last 7 Days</option>
-                    <option>Last 30 Days</option>
-                    <option>This Month</option>
-                </select>
-            </div>
-            <div class="card-body">
-                {% if daily_orders %}
-                <div class="chart-container">
-                    <div class="table-responsive">
-                        <table class="table table-hover">
-                            <thead class="table-light">
-                                <tr>
-                                    <th>Date</th>
-                                    <th>Bookings</th>
-                                    <th>Revenue</th>
-                                    <th>Trend</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                {% for order in daily_orders %}
-                                <tr>
-                                    <td>{{ order.booking_date__date|date:"M d, Y" }}</td>
-                                    <td>
-                                        <strong>{{ order.count }}</strong> bookings
-                                    </td>
-                                    <td class="text-success fw-bold">
-                                        ₹{{ order.daily_revenue|default:"0" }}
-                                    </td>
-                                    <td>
-                                        {% if order.count > 2 %}
-                                        <span class="badge bg-success">High</span>
-                                        {% elif order.count > 0 %}
-                                        <span class="badge bg-warning">Medium</span>
-                                        {% else %}
-                                        <span class="badge bg-secondary">Low</span>
-                                        {% endif %}
-                                    </td>
-                                </tr>
-                                {% endfor %}
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
-                {% else %}
-                <div class="text-center py-5">
-                    <div class="display-4 mb-3">📊</div>
-                    <h5>No data available</h5>
-                    <p class="text-muted">Start getting bookings to see analytics here.</p>
-                </div>
-                {% endif %}
-            </div>
-        </div>
-
-        <!-- Recent Bookings -->
-        <div class="card shadow-sm mb-4">
-            <div class="card-header bg-success text-white d-flex justify-content-between align-items-center">
-                <h6 class="mb-0"><i class="bi bi-clock-history"></i> Recent Bookings</h6>
-                <a href="{% url 'owner_bookings' %}" class="btn btn-light btn-sm">View All</a>
+        <!-- Bookings Table -->
+        <div class="card shadow-sm">
+            <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
+                <h6 class="mb-0"><i class="bi bi-list"></i> All Bookings</h6>
+                <span class="badge bg-light text-dark">{{ bookings.count }} bookings</span>
             </div>
             <div class="card-body">
                 {% if bookings %}
@@ -248,14 +205,17 @@
                                 <th>Date & Time</th>
                                 <th>Amount</th>
                                 <th>Status</th>
-                                <th>Action</th>
+                                <th>Payment</th>
+                                <th>Actions</th>
                             </tr>
                         </thead>
                         <tbody>
-                            {% for booking in bookings|slice:":5" %}
+                            {% for booking in bookings %}
                             <tr>
                                 <td>
                                     <strong>#{{ booking.id }}</strong>
+                                    <br>
+                                    <small class="text-muted">{{ booking.booking_date|date:"M d, Y" }}</small>
                                 </td>
                                 <td>
                                     <div class="d-flex align-items-center">
@@ -275,90 +235,107 @@
                                     <small class="text-muted">{{ booking.venue.sport.get_name_display }}</small>
                                 </td>
                                 <td>
-                                    {{ booking.time_slot.date|date:"M d" }}
-                                    <br>
-                                    <small class="text-muted">{{ booking.time_slot.start_time|time:"H:i" }}</small>
+                                    <div>
+                                        <strong>{{ booking.time_slot.date|date:"M d, Y" }}</strong>
+                                        <br>
+                                        <small>{{ booking.time_slot.start_time|time:"H:i" }} - {{ booking.time_slot.end_time|time:"H:i" }}</small>
+                                    </div>
                                 </td>
-                                <td class="fw-bold text-success">
-                                    ₹{{ booking.total_price }}
+                                <td class="fw-bold">
+                                    <div>₹{{ booking.total_price }}</div>
+                                    <small class="text-muted">1 hour</small>
                                 </td>
                                 <td>
                                     {% if booking.status == 'confirmed' %}
-                                    <span class="badge bg-success">Confirmed</span>
+                                    <span class="status-badge status-confirmed">
+                                        <i class="bi bi-check-circle"></i> Confirmed
+                                    </span>
                                     {% elif booking.status == 'pending' %}
-                                    <span class="badge bg-warning">Pending</span>
+                                    <span class="status-badge status-pending">
+                                        <i class="bi bi-clock"></i> Pending
+                                    </span>
                                     {% elif booking.status == 'cancelled' %}
-                                    <span class="badge bg-danger">Cancelled</span>
+                                    <span class="status-badge status-cancelled">
+                                        <i class="bi bi-x-circle"></i> Cancelled
+                                    </span>
                                     {% else %}
-                                    <span class="badge bg-secondary">{{ booking.status }}</span>
+                                    <span class="status-badge bg-secondary text-white">
+                                        {{ booking.status|title }}
+                                    </span>
                                     {% endif %}
                                 </td>
                                 <td>
-                                    <a href="{% url 'booking_detail' booking.id %}"
-                                        class="btn btn-sm btn-outline-primary">
-                                        <i class="bi bi-eye"></i>
-                                    </a>
+                                    {% if booking.payment_status == 'paid' %}
+                                    <span class="badge bg-success">Paid</span>
+                                    {% elif booking.payment_status == 'pending' %}
+                                    <span class="badge bg-warning">Pending</span>
+                                    {% elif booking.payment_status == 'failed' %}
+                                    <span class="badge bg-danger">Failed</span>
+                                    {% else %}
+                                    <span class="badge bg-secondary">{{ booking.payment_status|title }}</span>
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    <div class="btn-group btn-group-sm" role="group">
+                                        <a href="{% url 'booking_detail' booking.id %}" 
+                                           class="btn btn-outline-primary" 
+                                           title="View Details">
+                                            <i class="bi bi-eye"></i>
+                                        </a>
+                                        {% if booking.status == 'pending' %}
+                                        <button class="btn btn-outline-success confirm-btn" 
+                                                data-booking-id="{{ booking.id }}"
+                                                title="Confirm Booking">
+                                            <i class="bi bi-check-lg"></i>
+                                        </button>
+                                        {% endif %}
+                                        {% if booking.status != 'cancelled' %}
+                                        <button class="btn btn-outline-danger cancel-btn" 
+                                                data-booking-id="{{ booking.id }}"
+                                                title="Cancel Booking">
+                                            <i class="bi bi-x-lg"></i>
+                                        </button>
+                                        {% endif %}
+                                    </div>
                                 </td>
                             </tr>
                             {% endfor %}
                         </tbody>
                     </table>
                 </div>
+
+                <!-- Pagination if needed -->
+                {% if bookings.has_other_pages %}
+                <div class="mt-4">
+                    <nav aria-label="Bookings pagination">
+                        <ul class="pagination justify-content-center">
+                            {% if bookings.has_previous %}
+                            <li class="page-item">
+                                <a class="page-link" href="?page={{ bookings.previous_page_number }}">Previous</a>
+                            </li>
+                            {% endif %}
+
+                            <li class="page-item active">
+                                <span class="page-link">
+                                    Page {{ bookings.number }} of {{ bookings.paginator.num_pages }}
+                                </span>
+                            </li>
+
+                            {% if bookings.has_next %}
+                            <li class="page-item">
+                                <a class="page-link" href="?page={{ bookings.next_page_number }}">Next</a>
+                            </li>
+                            {% endif %}
+                        </ul>
+                    </nav>
+                </div>
+                {% endif %}
+
                 {% else %}
-                <div class="text-center py-4">
+                <div class="text-center py-5">
                     <div class="display-4 mb-3">📭</div>
                     <h5>No bookings yet</h5>
-                    <p class="text-muted">When you get bookings, they'll appear here.</p>
-                </div>
-                {% endif %}
-            </div>
-        </div>
-
-        <!-- My Venues -->
-        <div class="card shadow-sm">
-            <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
-                <h6 class="mb-0"><i class="bi bi-house"></i> My Venues</h6>
-                <span class="badge bg-light text-dark">{{ venues.count }} venues</span>
-            </div>
-            <div class="card-body">
-                {% if venues %}
-                <div class="row g-3">
-                    {% for venue in venues|slice:":3" %}
-                    <div class="col-md-4">
-                        <div class="card h-100">
-                            <img src="{{ venue.image_url }}" class="card-img-top" alt="{{ venue.name }}"
-                                style="height: 150px; object-fit: cover;">
-                            <div class="card-body">
-                                <h6 class="card-title">{{ venue.name|truncatechars:20 }}</h6>
-                                <p class="card-text small">
-                                    <span class="badge bg-info">{{ venue.sport.get_name_display }}</span>
-                                    <br>
-                                    <small class="text-muted">{{ venue.address|truncatechars:30 }}</small>
-                                </p>
-                                <div class="d-flex justify-content-between align-items-center">
-                                    <span class="fw-bold">₹{{ venue.price_per_hour }}/hr</span>
-                                    <a href="{% url 'venue_detail' venue.id %}" class="btn btn-sm btn-outline-primary">
-                                        View
-                                    </a>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    {% endfor %}
-                </div>
-                {% if venues.count > 3 %}
-                <div class="text-center mt-3">
-                    <a href="{% url 'owner_venues' %}" class="btn btn-outline-primary">View All Venues</a>
-                </div>
-                {% endif %}
-                {% else %}
-                <div class="text-center py-4">
-                    <div class="display-4 mb-3">🏟️</div>
-                    <h5>No venues added yet</h5>
-                    <p class="text-muted">Start by adding your first venue.</p>
-                    <button class="btn btn-success" data-bs-toggle="modal" data-bs-target="#addVenueModal">
-                        <i class="bi bi-plus-circle"></i> Add Your First Venue
-                    </button>
+                    <p class="text-muted">When customers book your venues, they'll appear here.</p>
                 </div>
                 {% endif %}
             </div>
@@ -374,7 +351,7 @@
                 <h5 class="modal-title"><i class="bi bi-plus-circle"></i> Add New Venue</h5>
                 <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
             </div>
-            <form method="post" action="{% url 'owner_dashboard' %}" enctype="multipart/form-data">
+            <form method="post" action="{% url 'owner_venues' %}" enctype="multipart/form-data">
                 {% csrf_token %}
                 <div class="modal-body">
                     <div class="row">
@@ -421,9 +398,16 @@
                             placeholder="https://maps.google.com/...">
                     </div>
 
+                    <div class="form-check mb-3">
+                        <input class="form-check-input" type="checkbox" name="is_active" id="isActive" checked>
+                        <label class="form-check-label" for="isActive">
+                            Make venue active immediately
+                        </label>
+                    </div>
+
                     <div class="alert alert-info">
                         <i class="bi bi-info-circle"></i>
-                        You can add time slots for this venue after creation.
+                        You can add time slots for this venue after creation in the venue management section.
                     </div>
                 </div>
                 <div class="modal-footer">
@@ -434,4 +418,32 @@
         </div>
     </div>
 </div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Confirm booking buttons
+        document.querySelectorAll('.confirm-btn').forEach(button => {
+            button.addEventListener('click', function() {
+                const bookingId = this.getAttribute('data-booking-id');
+                if (confirm('Are you sure you want to confirm this booking?')) {
+                    // Placeholder for actual confirmation logic
+                    alert('Confirm functionality will be implemented soon. Booking ID: ' + bookingId);
+                }
+            });
+        });
+
+        // Cancel booking buttons
+        document.querySelectorAll('.cancel-btn').forEach(button => {
+            button.addEventListener('click', function() {
+                const bookingId = this.getAttribute('data-booking-id');
+                if (confirm('Are you sure you want to cancel this booking?')) {
+                    // Placeholder for actual cancellation logic
+                    alert('Cancel functionality will be implemented soon. Booking ID: ' + bookingId);
+                }
+            });
+        });
+    });
+</script>
 {% endblock %}
