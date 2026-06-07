@@ -113,6 +113,210 @@
             color: white;
             font-weight: bold;
         }
+
+        /* Mobile Navbar Toggle Button - White Color */
+        .navbar-toggler {
+            border-color: white !important;
+        }
+
+        .navbar-toggler .navbar-toggler-icon {
+            background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 30 30'%3e%3cpath stroke='%23ffffff' stroke-linecap='round' stroke-miterlimit='10' stroke-width='2' d='M4 7h22M4 15h22M4 23h22'/%3e%3c/svg%3e") !important;
+        }
+
+        .navbar-toggler:focus {
+            box-shadow: 0 0 0 0.25rem rgba(255, 255, 255, 0.25) !important;
+        }
+
+        /* Dropdown Menu Redesign */
+        .dropdown-menu {
+            border: none;
+            border-radius: 12px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+            padding: 10px 0;
+            background-color: #ffffff;
+            margin-top: 8px;
+            animation: dropdownSlide 0.3s ease-in-out;
+        }
+
+        @keyframes dropdownSlide {
+            from {
+                opacity: 0;
+                transform: translateY(-10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .dropdown-item {
+            padding: 12px 20px;
+            color: #333 !important;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            border-left: 3px solid transparent;
+        }
+
+        .dropdown-item:hover {
+            background-color: #f8f9fa;
+            color: #667eea !important;
+            border-left-color: #667eea;
+            transform: translateX(5px);
+        }
+
+        .dropdown-item.text-danger {
+            color: #dc3545 !important;
+        }
+
+        .dropdown-item.text-danger:hover {
+            background-color: #fff5f5;
+            border-left-color: #dc3545;
+        }
+
+        .dropdown-divider {
+            margin: 8px 0;
+            opacity: 0.1;
+        }
+
+        .dropdown-toggle::after {
+            transition: transform 0.3s ease;
+        }
+
+        .dropdown-toggle[aria-expanded="true"]::after {
+            transform: rotate(180deg);
+        }
+
+        /* Mobile Navigation Alignment */
+        @media (max-width: 991px) {
+            .navbar-collapse {
+                padding-top: 15px;
+                border-top: 1px solid rgba(255, 255, 255, 0.1);
+                margin-top: 10px;
+            }
+
+            .navbar-nav {
+                flex-direction: column;
+                gap: 0;
+            }
+
+            .navbar-nav .nav-item {
+                padding: 8px 0;
+                border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+            }
+
+            .navbar-nav .nav-link {
+                padding: 10px 0 !important;
+                font-weight: 500;
+                transition: all 0.3s ease;
+            }
+
+            .navbar-nav .nav-link:hover {
+                padding-left: 10px;
+                color: #667eea !important;
+            }
+
+            .navbar-nav .ms-auto {
+                flex-direction: column;
+                gap: 10px;
+                margin-top: 15px;
+                padding-top: 15px;
+                border-top: 1px solid rgba(255, 255, 255, 0.1);
+            }
+
+            .navbar-nav .btn {
+                width: 100%;
+                margin-left: 0 !important;
+                margin-right: 0 !important;
+            }
+
+            .dropdown-menu {
+                position: static;
+                float: none;
+                width: 100%;
+                margin-top: 10px !important;
+                box-shadow: inset 0 2px 5px rgba(0, 0, 0, 0.1);
+                border-radius: 8px;
+            }
+        }
+
+        /* Modal Styling */
+        .modal-content {
+            border: none;
+            border-radius: 15px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+        }
+
+        .modal-header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 15px 15px 0 0;
+            padding: 25px;
+        }
+
+        .modal-header .btn-close {
+            filter: brightness(0) invert(1);
+        }
+
+        .modal-body {
+            padding: 30px 25px;
+        }
+
+        .modal-footer {
+            border-top: 1px solid #e0e0e0;
+            padding: 15px 25px;
+            background-color: #f8f9fa;
+        }
+
+        .form-control {
+            border-radius: 8px;
+            border: 1px solid #ddd;
+            padding: 12px 15px;
+            transition: all 0.3s ease;
+        }
+
+        .form-control:focus {
+            border-color: #667eea;
+            box-shadow: 0 0 0 0.2rem rgba(102, 126, 234, 0.25);
+        }
+
+        .form-label {
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 8px;
+        }
+
+        .modal-toggle-text {
+            text-align: center;
+            margin-top: 15px;
+            color: #666;
+        }
+
+        .modal-toggle-text a {
+            color: #667eea;
+            text-decoration: none;
+            font-weight: 600;
+            cursor: pointer;
+        }
+
+        .modal-toggle-text a:hover {
+            text-decoration: underline;
+        }
+
+        .form-check-input {
+            width: 1.25em;
+            height: 1.25em;
+        }
+
+        .form-check-input:checked {
+            background-color: #667eea;
+            border-color: #667eea;
+        }
+
+        .form-check-input:focus {
+            border-color: #667eea;
+            box-shadow: 0 0 0 0.25rem rgba(102, 126, 234, 0.25);
+        }
     </style>
     {% block extra_css %}{% endblock %}
 </head>
@@ -167,14 +371,14 @@
                     </li>
                     {% else %}
                     <li class="nav-item">
-                        <a class="btn btn-primary ms-2 rounded-pill" href="{% url 'login' %}">
+                        <button class="btn btn-primary ms-2 rounded-pill" data-bs-toggle="modal" data-bs-target="#loginModal">
                             <i class="bi bi-box-arrow-in-right"></i> Login
-                        </a>
+                        </button>
                     </li>
                     <li class="nav-item ms-2">
-                        <a class="btn btn-primary ms-2 rounded-pill" href="{% url 'owner_login' %}">
-                            <i class="bi bi-shield-lock"></i> Owner Login
-                        </a>
+                        <button class="btn btn-primary ms-2 rounded-pill" data-bs-toggle="modal" data-bs-target="#signupModal">
+                            <i class="bi bi-person-plus"></i> Sign Up
+                        </button>
                     </li>
                     {% endif %}
                 </ul>
@@ -293,6 +497,104 @@
     <script type="module" src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.esm.js"></script>
     <script nomodule src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.js"></script>
     {% block extra_js %}{% endblock %}
+
+    <!-- Login Modal -->
+    <div class="modal fade" id="loginModal" tabindex="-1">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">
+                        <i class="bi bi-box-arrow-in-right me-2"></i>User Login
+                    </h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <form method="post" action="{% url 'login' %}">
+                    {% csrf_token %}
+                    <div class="modal-body">
+                        <div class="mb-3">
+                            <label for="loginUsername" class="form-label">Username or Email</label>
+                            <input type="text" class="form-control" id="loginUsername" name="username" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="loginPassword" class="form-label">Password</label>
+                            <input type="password" class="form-control" id="loginPassword" name="password" required>
+                        </div>
+                        <div class="form-check mb-3">
+                            <input class="form-check-input" type="checkbox" id="rememberMe" name="remember">
+                            <label class="form-check-label" for="rememberMe">Remember me</label>
+                        </div>
+                        <a href="#" class="text-decoration-none small text-muted">Forgot password?</a>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="submit" class="btn btn-primary w-100">
+                            <i class="bi bi-box-arrow-in-right me-2"></i>Login
+                        </button>
+                    </div>
+                    <div class="modal-toggle-text">
+                        Don't have an account? 
+                        <a onclick="document.getElementById('loginModal').style.display='none'; new bootstrap.Modal(document.getElementById('signupModal')).show();">
+                            Sign Up Here
+                        </a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Signup Modal -->
+    <div class="modal fade" id="signupModal" tabindex="-1">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">
+                        <i class="bi bi-person-plus me-2"></i>Create Account
+                    </h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <form method="post" action="{% url 'signup' %}">
+                    {% csrf_token %}
+                    <div class="modal-body">
+                        <div class="mb-3">
+                            <label for="signupUsername" class="form-label">Username</label>
+                            <input type="text" class="form-control" id="signupUsername" name="username" required>
+                            <small class="text-muted">This will be your public name</small>
+                        </div>
+                        <div class="mb-3">
+                            <label for="signupEmail" class="form-label">Email Address</label>
+                            <input type="email" class="form-control" id="signupEmail" name="email" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="signupPassword" class="form-label">Password</label>
+                            <input type="password" class="form-control" id="signupPassword" name="password1" required>
+                            <small class="text-muted">Use 8+ characters with letters & numbers</small>
+                        </div>
+                        <div class="mb-3">
+                            <label for="signupPasswordConfirm" class="form-label">Confirm Password</label>
+                            <input type="password" class="form-control" id="signupPasswordConfirm" name="password2" required>
+                        </div>
+                        <div class="form-check mb-3">
+                            <input class="form-check-input" type="checkbox" id="agreeTerms" required>
+                            <label class="form-check-label" for="agreeTerms">
+                                I agree to the <a href="#" class="text-decoration-none">Terms & Conditions</a>
+                            </label>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="submit" class="btn btn-primary w-100">
+                            <i class="bi bi-person-plus me-2"></i>Create Account
+                        </button>
+                    </div>
+                    <div class="modal-toggle-text">
+                        Already have an account? 
+                        <a onclick="document.getElementById('signupModal').style.display='none'; new bootstrap.Modal(document.getElementById('loginModal')).show();">
+                            Login Here
+                        </a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
 </body>
 
 </html>

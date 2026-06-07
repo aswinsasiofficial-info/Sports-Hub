@@ -2,13 +2,26 @@
 
 {% block title %}Home - Sports Hub{% endblock %}
 
+{% block extra_js %}
+<script>
+    // Show login modal for unauthenticated users on home page
+    document.addEventListener('DOMContentLoaded', function() {
+        const isAuthenticated = "{{ user.is_authenticated|lower }}";
+        if (isAuthenticated === 'false') {
+            const loginModal = new bootstrap.Modal(document.getElementById('loginModal'));
+            loginModal.show();
+        }
+    });
+</script>
+{% endblock %}
+
 {% block content %}
 <!-- Hero Section -->
 <section class="hero-section text-center py-5 rounded mb-5">
     <h1 class="lead mb-3">BOOK YOUR GAME, ANYTIME, ANYWHERE!</h1>
     <p class="mb-4 fs-5">Find and book premium sports venues near you. From badminton courts to swimming pools.</p>
     <a href="{% url 'venue_list' %}" class="btn btn-light btn-lg px-4 rounded-pill">
-        <i class="bi bi-search me-2"></i>Explore Venues →
+        <i class="bi bi-search me-2"></i>Get Started →
     </a>
 </section>
 
